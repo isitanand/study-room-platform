@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import dynamic from 'next/dynamic'
 import { createClient } from '@/lib/supabase/client'
-import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { RoomCard } from './RoomCard'
 import { CreateRoomDialog } from './CreateRoomDialog'
@@ -13,14 +12,14 @@ import { StatsCards } from './StatsCards'
 // Lazy load StudyChart component to optimize performance
 const StudyChart = dynamic(
   () => import('./StudyChart').then((mod) => mod.StudyChart),
-  { ssr: false, loading: () => <Skeleton className="h-[340px] w-full bg-zinc-900/60" /> }
+  { ssr: false, loading: () => <Skeleton className="h-[340px] w-full bg-[#f4eee5] border border-[#e7e7e7] rounded-[10px]" /> }
 )
 
 import { ActivityFeed } from './ActivityFeed'
 import { Leaderboard } from './Leaderboard'
 import { DashboardShell } from './DashboardShell'
 import { toast } from 'sonner'
-import { Plus, LogIn, Users, Timer, Sparkles } from 'lucide-react'
+import { Plus, LogIn, Users } from 'lucide-react'
 
 export type Room = {
   id: string
@@ -79,7 +78,6 @@ export function DashboardClient({ userId }: DashboardClientProps) {
       if (memberErr) throw memberErr
 
       // Filter only active rooms
-      type RoomRow = { role: string; room_id: string; rooms: Record<string, any> }
       const activeRows = ((memberData || []) as any[]).filter(
         (m) => m.rooms && m.rooms.is_active === true
       )
@@ -322,8 +320,8 @@ export function DashboardClient({ userId }: DashboardClientProps) {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-white tracking-tight">Study Dashboard</h2>
-          <p className="text-zinc-500 text-sm mt-1">
+          <h2 className="text-[#141414] text-heading-lg font-semibold tracking-tight select-none">Study Dashboard</h2>
+          <p className="text-[14px] text-[#4e4d4c] mt-2 leading-relaxed">
             {loading
               ? 'Loading study overview…'
               : rooms.length > 0
@@ -331,34 +329,33 @@ export function DashboardClient({ userId }: DashboardClientProps) {
               : 'No joined study rooms yet'}
           </p>
         </div>
-        <div className="flex items-center gap-2.5 shrink-0">
-          <Button
+        <div className="flex items-center gap-4 shrink-0 font-sans">
+          <button
             id="join-room-btn"
-            variant="outline"
             onClick={() => setJoinOpen(true)}
-            className="border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-white h-9 rounded-xl"
+            className="border border-[#e7e7e7] bg-white text-[#262626] hover:bg-[#f4eee5] rounded-[5px] font-sans font-medium text-[14px] h-9 px-4 flex items-center gap-1.5 transition-all shadow-none cursor-pointer"
           >
-            <LogIn className="w-4 h-4 mr-2" />
+            <LogIn className="w-3.5 h-3.5 text-[#262626]" />
             Join Room
-          </Button>
-          <Button
+          </button>
+          <button
             id="create-room-btn"
             onClick={() => setCreateOpen(true)}
-            className="bg-violet-600 hover:bg-violet-500 text-white h-9 shadow-lg shadow-violet-900/25 rounded-xl"
+            className="btn-evernote-primary text-[14px] px-4 h-9 flex items-center gap-1.5"
           >
-            <Plus className="w-4 h-4 mr-2" />
+            <Plus className="w-3.5 h-3.5 text-white" />
             Create Room
-          </Button>
+          </button>
         </div>
       </div>
 
       {/* TOP SECTION: Stats Cards */}
       {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-5 space-y-3">
-              <Skeleton className="h-4 w-28 bg-zinc-800" />
-              <Skeleton className="h-8 w-16 bg-zinc-800" />
+            <div key={i} className="bg-white border border-[#e7e7e7] rounded-[10px] p-5 space-y-4">
+              <Skeleton className="h-4 w-28 bg-[#f4eee5] rounded-[5px]" />
+              <Skeleton className="h-8 w-16 bg-[#f4eee5] rounded-[5px]" />
             </div>
           ))}
         </div>
@@ -377,43 +374,43 @@ export function DashboardClient({ userId }: DashboardClientProps) {
       )}
 
       {/* BOTTOM SECTION: Two Columns */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left wider column: Room cards */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="border-b border-zinc-850 pb-2.5">
-            <h3 className="text-base font-bold text-zinc-300 flex items-center gap-2">
-              <Users className="w-4.5 h-4.5 text-violet-400" />
+          <div className="border-b border-[#e7e7e7] pb-2.5">
+            <h3 className="text-heading-sm font-semibold text-[#141414] flex items-center gap-2">
+              <Users className="w-5 h-5 text-[#262626]" />
               Active Study Rooms
             </h3>
           </div>
 
           {loading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {Array.from({ length: 2 }).map((_, i) => (
-                <div key={i} className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-5 space-y-4">
-                  <Skeleton className="h-5 w-3/4 bg-zinc-800" />
-                  <Skeleton className="h-12 w-full bg-zinc-800" />
+                <div key={i} className="bg-white border border-[#e7e7e7] rounded-[10px] p-5 space-y-4">
+                  <Skeleton className="h-5 w-3/4 bg-[#f4eee5] rounded-[5px]" />
+                  <Skeleton className="h-12 w-full bg-[#f4eee5] rounded-[5px]" />
                 </div>
               ))}
             </div>
           ) : rooms.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 px-4 text-center bg-zinc-900/10 border border-dashed border-zinc-800 rounded-2xl">
-              <div className="w-12 h-12 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center mb-4 text-zinc-550">
-                <Users className="w-6 h-6" />
+            <div className="flex flex-col items-center justify-center py-20 px-4 text-center bg-white border border-[#e7e7e7] rounded-[10px]">
+              <div className="w-12 h-12 rounded-[10px] border border-[#e7e7e7] flex items-center justify-center mb-4 text-[#141414] bg-[#f4eee5]">
+                <Users className="w-5 h-5 text-[#141414]" />
               </div>
-              <h3 className="text-sm font-bold text-white mb-1">Start your first study session!</h3>
-              <p className="text-zinc-500 text-xs max-w-xs mb-5">
+              <h3 className="text-heading-sm text-[#141414] font-semibold mb-1.5">Start your first study session!</h3>
+              <p className="text-[14px] text-[#4e4d4c] max-w-xs mb-5 leading-relaxed">
                 Join a room using an invite code or create a new room to collaborate.
               </p>
-              <Button
+              <button
                 onClick={() => setJoinOpen(true)}
-                className="bg-violet-650 hover:bg-violet-750 text-white font-semibold text-xs px-5 py-2.5 rounded-xl shadow-md"
+                className="btn-evernote-primary text-[14px] py-2 px-5"
               >
                 Join with Code
-              </Button>
+              </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {rooms.map((room) => (
                 <RoomCard
                   key={room.id}
@@ -430,8 +427,8 @@ export function DashboardClient({ userId }: DashboardClientProps) {
         <div className="space-y-6">
           {loading ? (
             <div className="space-y-4">
-              <Skeleton className="h-44 w-full bg-zinc-900/60" />
-              <Skeleton className="h-44 w-full bg-zinc-900/60" />
+              <Skeleton className="h-44 w-full bg-white border border-[#e7e7e7] rounded-[10px]" />
+              <Skeleton className="h-44 w-full bg-white border border-[#e7e7e7] rounded-[10px]" />
             </div>
           ) : (
             <>
@@ -464,3 +461,4 @@ export function DashboardClient({ userId }: DashboardClientProps) {
     </DashboardShell>
   )
 }
+

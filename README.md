@@ -61,8 +61,8 @@ StudyRoom is a real-time collaborative study space designed for peer learning gr
 
 4. **Set up Supabase Database**
    - Create a new project in the Supabase console.
-   - Run the SQL schema script located in the repository or configure the tables: `profiles`, `rooms`, `room_members`, `study_sessions`, `messages`, and `activity_log`.
-   - Enable Realtime replication for the tables: `messages`, `study_sessions`, `activity_log`, and `room_members`.
+   - Go to the **SQL Editor** in Supabase and run the queries defined in the [supabase-schema.sql](file:///c:/Users/ASUS/.gemini/antigravity/scratch/chatroom/supabase-schema.sql) file at the root of the project to initialize all tables, relations, and row-level security (RLS) policies.
+   - Enable Realtime replication under **Database -> Replication -> Publications (supabase_realtime)** for these tables: `messages`, `study_sessions`, `activity_log`, and `room_members`.
 
 5. **Run the development server**
    ```bash

@@ -93,29 +93,31 @@ export function JoinRoomDialog({ open, onOpenChange, userId, onSuccess }: JoinRo
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-zinc-900 border-zinc-800 text-white sm:max-w-sm">
-        <DialogHeader>
-          <div className="flex items-center gap-2.5 mb-1">
-            <div className="w-8 h-8 rounded-lg bg-violet-600/20 border border-violet-500/30 flex items-center justify-center">
-              <Hash className="w-4 h-4 text-violet-400" />
+      <DialogContent className="bg-[#ffffff] border border-[#e7e7e7] text-[#141414] sm:max-w-sm rounded-[16px] shadow-none p-6 font-sans">
+        <DialogHeader className="space-y-3">
+          <div className="flex items-center gap-3 mb-1">
+            <div className="w-8 h-8 rounded-[5px] border border-[#e7e7e7] flex items-center justify-center bg-[#f4eee5]">
+              <Hash className="w-4 h-4 text-[#141414]" />
             </div>
-            <DialogTitle className="text-white text-lg">Join Study Room</DialogTitle>
+            <DialogTitle className="text-[#141414] text-heading-sm font-semibold tracking-tight">
+              Join Study Room
+            </DialogTitle>
           </div>
-          <DialogDescription className="text-zinc-400 text-sm">
+          <DialogDescription className="text-[#4e4d4c] text-[13px] tracking-normal font-normal">
             Enter the 8-character invite code shared by the room owner.
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4 mt-1">
+        <form onSubmit={handleSubmit} className="space-y-4 mt-3">
           {error && (
-            <div className="rounded-lg bg-red-950/50 border border-red-900/50 px-3.5 py-2.5 text-sm text-red-400">
+            <div className="rounded-[5px] bg-[#f4eee5] border border-[#cc3737]/20 px-3.5 py-2.5 text-[13px] font-normal text-[#cc3737]">
               {error}
             </div>
           )}
 
           <div className="space-y-1.5">
-            <Label htmlFor="join-invite-code" className="text-zinc-300 text-sm font-medium">
-              Invite Code <span className="text-red-400">*</span>
+            <Label htmlFor="join-invite-code" className="text-[#4e4d4c] text-[13px] font-medium tracking-normal">
+              Invite Code <span className="text-[#cc3737]">*</span>
             </Label>
             <Input
               id="join-invite-code"
@@ -125,18 +127,19 @@ export function JoinRoomDialog({ open, onOpenChange, userId, onSuccess }: JoinRo
               required
               autoComplete="off"
               disabled={loading}
-              className="bg-zinc-800/60 border-zinc-700 text-white placeholder:text-zinc-400 focus-visible:ring-violet-500/50 focus-visible:border-violet-500/50 h-12 text-center font-mono text-xl tracking-[0.3em]"
+              className="bg-white border border-[#e7e7e7] text-[#141414] placeholder:text-[#a1a1a1] focus-visible:ring-1 focus-visible:ring-[#0A7C6E] focus-visible:border-[#141414] rounded-[5px] h-12 text-center text-xl tracking-[0.3em] font-mono uppercase"
             />
-            <p className="text-xs text-zinc-600">8 characters — letters and numbers</p>
+            <p className="text-[#737373] text-[12px] tracking-normal font-normal mt-1">
+              8 characters — letters and numbers
+            </p>
           </div>
 
-          <div className="flex justify-end gap-2.5 pt-2 border-t border-zinc-800">
+          <div className="flex justify-end gap-3 pt-4 border-t border-[#e7e7e7] mt-6">
             <Button
               type="button"
-              variant="ghost"
               onClick={() => onOpenChange(false)}
               disabled={loading}
-              className="text-zinc-400 hover:text-white hover:bg-zinc-800"
+              className="bg-transparent text-[#4e4d4c] hover:text-[#141414] hover:bg-[#f4eee5] rounded-[5px] font-medium text-[14px] px-4 h-10 transition-all border-none shadow-none cursor-pointer"
             >
               Cancel
             </Button>
@@ -144,11 +147,11 @@ export function JoinRoomDialog({ open, onOpenChange, userId, onSuccess }: JoinRo
               id="join-room-submit"
               type="submit"
               disabled={loading}
-              className="bg-violet-600 hover:bg-violet-500 text-white min-w-24 shadow-lg shadow-violet-900/20"
+              className="btn-evernote-primary h-10 min-w-24 text-[14px]"
             >
               {loading ? (
                 <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin text-white" />
                   Joining…
                 </>
               ) : (
@@ -161,3 +164,4 @@ export function JoinRoomDialog({ open, onOpenChange, userId, onSuccess }: JoinRo
     </Dialog>
   )
 }
+

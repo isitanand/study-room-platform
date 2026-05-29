@@ -8,7 +8,6 @@ interface StatsCardsProps {
   sessionsCompletedCount: number
   roomsJoinedCount: number
   studyStreakDays: number
-  // comparison stats optionally
   diffTimeHours?: number
   diffSessionsCount?: number
   diffRoomsCount?: number
@@ -38,57 +37,54 @@ export function StatsCards({
       title: 'Total Study Time',
       value: formatTime(totalStudyTimeSeconds),
       comparison: `+${diffTimeHours}h from last week`,
-      icon: <Clock className="w-5 h-5 text-violet-400" />,
-      gradient: 'from-violet-600/10 to-indigo-600/5 border-violet-500/20',
+      icon: <Clock className="w-4 h-4 text-[#0A7C6E]" />,
+      iconBg: 'bg-[#e6f4f2]',
     },
     {
       title: 'Sessions Completed',
       value: sessionsCompletedCount,
       comparison: `+${diffSessionsCount} from last week`,
-      icon: <CheckCircle2 className="w-5 h-5 text-emerald-400" />,
-      gradient: 'from-emerald-600/10 to-teal-600/5 border-emerald-500/20',
+      icon: <CheckCircle2 className="w-4 h-4 text-[#0A7C6E]" />,
+      iconBg: 'bg-[#e6f4f2]',
     },
     {
       title: 'Rooms Joined',
       value: roomsJoinedCount,
       comparison: diffRoomsCount >= 0 ? `+${diffRoomsCount} this week` : `${diffRoomsCount} this week`,
-      icon: <Users className="w-5 h-5 text-blue-400" />,
-      gradient: 'from-blue-600/10 to-cyan-600/5 border-blue-500/20',
+      icon: <Users className="w-4 h-4 text-[#0A7C6E]" />,
+      iconBg: 'bg-[#e6f4f2]',
     },
     {
       title: 'Study Streak',
-      value: `${studyStreakDays} day${studyStreakDays !== 1 ? 's' : ''}`,
-      comparison: `+${diffStreak} day streak increase`,
-      icon: <Flame className="w-5 h-5 text-amber-500 fill-amber-500/10" />,
-      gradient: 'from-amber-600/10 to-orange-600/5 border-amber-500/20',
+      value: `${studyStreakDays} Day${studyStreakDays !== 1 ? 's' : ''}`,
+      comparison: `+${diffStreak} day increase`,
+      icon: <Flame className="w-4 h-4 text-amber-500" />,
+      iconBg: 'bg-[#fffbeb]',
     },
   ]
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       {statItems.map((item, idx) => (
         <Card
           key={idx}
-          className={`relative overflow-hidden bg-gradient-to-br ${item.gradient} border bg-zinc-900/40 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02]`}
+          className="bg-white border border-[#e7e7e7] rounded-[10px] relative overflow-hidden transition-all duration-300 hover:border-[#0A7C6E] shadow-none"
         >
-          {/* Decorative subtle background light */}
-          <div className="absolute -right-6 -bottom-6 w-24 h-24 bg-white/3 rounded-full blur-2xl" />
-
-          <CardContent className="p-5 flex flex-col gap-2.5">
+          <CardContent className="p-5 flex flex-col gap-4">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-zinc-550 uppercase tracking-wider">
+              <span className="text-[12px] text-[#737373] font-medium">
                 {item.title}
               </span>
-              <div className="w-9 h-9 rounded-xl bg-zinc-950/50 border border-zinc-800/80 flex items-center justify-center shadow-inner">
+              <div className={`w-8 h-8 rounded-[5px] flex items-center justify-center shrink-0 ${item.iconBg}`}>
                 {item.icon}
               </div>
             </div>
 
             <div>
-              <h4 className="text-2xl font-black text-white tracking-tight leading-none">
+              <h4 className="text-[28px] text-[#141414] font-semibold tracking-tight leading-none">
                 {item.value}
               </h4>
-              <p className="text-[10px] font-semibold text-zinc-500 mt-1.5 flex items-center gap-1">
+              <p className="text-[12px] text-[#737373] mt-2 font-normal">
                 {item.comparison}
               </p>
             </div>

@@ -10,7 +10,7 @@ import { StudyTimer } from './StudyTimer'
 import { ActivityLog } from './ActivityLog'
 import { RoomHistory } from './RoomHistory'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft, BookOpen, Menu, MessageSquare, History } from 'lucide-react'
+import { ArrowLeft, Menu, MessageSquare, History } from 'lucide-react'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 
 interface Profile {
@@ -75,7 +75,7 @@ export function RoomClient({
   const router = useRouter()
   const supabase = createClient()
 
-  // Room states
+  
   const [activeTab, setActiveTab] = useState<'chat' | 'history'>('chat')
   const [members, setMembers] = useState<Member[]>(initialMembers)
   const [messages, setMessages] = useState<Message[]>(initialMessages)
@@ -83,7 +83,46 @@ export function RoomClient({
   const [activities, setActivities] = useState<ActivityItem[]>(initialActivities)
   const [onlineUserIds, setOnlineUserIds] = useState<string[]>([currentUser.id])
 
-  // Helper to fetch user profile if it's missing in our member list
+  
+  const [timerHeight, setTimerHeight] = useState(250) 
+  const [isDragging, setIsDragging] = useState(false)
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault()
+    setIsDragging(true)
+  }
+
+  useEffect(() => {
+    if (!isDragging) return
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const middleContainer = document.getElementById('middle-container')
+      if (!middleContainer) return
+
+      const rect = middleContainer.getBoundingClientRect()
+      const newHeight = e.clientY - rect.top
+
+      const minHeight = 55 
+      const maxHeight = Math.min(500, rect.height - 150) 
+
+      if (newHeight >= minHeight && newHeight <= maxHeight) {
+        setTimerHeight(newHeight)
+      }
+    }
+
+    const handleMouseUp = () => {
+      setIsDragging(false)
+    }
+
+    document.addEventListener('mousemove', handleMouseMove)
+    document.addEventListener('mouseup', handleMouseUp)
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseup', handleMouseUp)
+    }
+  }, [isDragging])
+
+  
   const getOrFetchProfile = useCallback(
     async (userId: string): Promise<Profile | undefined> => {
       const existing = members.find((m) => m.userId === userId)
@@ -101,9 +140,9 @@ export function RoomClient({
     [members, supabase]
   )
 
-  // Realtime Subscriptions
+  
   useEffect(() => {
-    // 1. Setup Presence tracking
+    
     const presenceChannel = supabase.channel(`room_presence:${room.id}`, {
       config: { presence: { key: currentUser.id } },
     })
@@ -123,7 +162,7 @@ export function RoomClient({
         }
       })
 
-    // 2. Setup Message Database subscription
+    
     const messageChannel = supabase
       .channel(`room_messages:${room.id}`)
       .on(
@@ -139,7 +178,7 @@ export function RoomClient({
           const profile = await getOrFetchProfile(newMsg.user_id)
           
           setMessages((prev) => {
-            // Avoid duplicates
+            
             if (prev.some((m) => m.id === newMsg.id)) return prev
             return [
               ...prev,
@@ -157,13 +196,13 @@ export function RoomClient({
       )
       .subscribe()
 
-    // 3. Setup Study Session Database subscription
+    
     const sessionChannel = supabase
       .channel(`room_sessions:${room.id}`)
       .on(
         'postgres_changes',
         {
-          event: '*', // Listen to INSERT and UPDATE
+          event: '*', 
           schema: 'public',
           table: 'study_sessions',
           filter: `room_id=eq.${room.id}`,
@@ -178,7 +217,7 @@ export function RoomClient({
               room_id: session.room_id,
               started_by: session.started_by,
               started_at: session.started_at,
-              duration_minutes: Math.round(session.duration_seconds / 60),
+              duration_seconds: Math.round(session.duration_seconds / 60),
               ends_at: session.ended_at,
               status: 'active',
               created_at: session.started_at
@@ -188,7 +227,7 @@ export function RoomClient({
       )
       .subscribe()
 
-    // 4. Setup Activity Log subscription
+    
     const activityChannel = supabase
       .channel(`room_activities:${room.id}`)
       .on(
@@ -216,12 +255,12 @@ export function RoomClient({
                 profile,
               },
               ...prev,
-            ].slice(0, 20) // Cap to last 20
+            ].slice(0, 20) 
           })
 
-          // If a new member joined, trigger reload of member list
+          
           if (newAct.action === 'join' || newAct.action === 'member_joined') {
-            // Fetch updated members list
+            
             const { data: membersRaw } = await supabase
               .from('room_members')
               .select(`
@@ -261,7 +300,7 @@ export function RoomClient({
     }
   }, [room.id, currentUser.id, getOrFetchProfile, supabase])
 
-  // Database action: Send message
+  
   const handleSendMessage = async (content: string) => {
     const { error } = await supabase.from('messages').insert({
       room_id: room.id,
@@ -272,12 +311,12 @@ export function RoomClient({
     if (error) throw error
   }
 
-  // Database action: Start study session
+  
   const handleStartSession = async (durationMinutes: number) => {
     const now = new Date()
     const endedAt = new Date(now.getTime() + durationMinutes * 60000)
 
-    // First insert study session
+    
     const { data: newSession, error: sessionErr } = await supabase
       .from('study_sessions')
       .insert({
@@ -292,11 +331,11 @@ export function RoomClient({
 
     if (sessionErr) throw sessionErr
 
-    // Find current user's username
+    
     const myMember = members.find((m) => m.userId === currentUser.id)
     const myUsername = myMember?.profile?.username || currentUser.email?.split('@')[0] || 'User'
 
-    // Insert activity log
+    
     await supabase.from('activity_log').insert({
       room_id: room.id,
       user_id: currentUser.id,
@@ -309,11 +348,11 @@ export function RoomClient({
     })
   }
 
-  // Database action: End study session (completed or cancelled)
+  
   const handleEndSession = async (sessionId: string, status: 'completed' | 'cancelled') => {
     const now = new Date()
     
-    // Retrieve the session to compute elapsed seconds
+    
     const { data: session } = await supabase
       .from('study_sessions')
       .select('started_at')
@@ -334,11 +373,11 @@ export function RoomClient({
 
     if (updateErr) throw updateErr
 
-    // Find current user's username
+    
     const myMember = members.find((m) => m.userId === currentUser.id)
     const myUsername = myMember?.profile?.username || currentUser.email?.split('@')[0] || 'User'
 
-    // Insert activity log
+    
     await supabase.from('activity_log').insert({
       room_id: room.id,
       user_id: currentUser.id,
@@ -353,35 +392,43 @@ export function RoomClient({
   }
 
   return (
-    <div className="h-screen flex flex-col bg-[#09090b] text-white overflow-hidden">
-      {/* Header */}
-      <header className="h-14 border-b border-zinc-800 bg-zinc-950/60 backdrop-blur-md px-4 flex items-center justify-between shrink-0">
+    <div className="h-screen flex flex-col bg-[#f9f6f2] text-[#141414] overflow-hidden font-sans">
+      {}
+      <header className="h-16 border-b border-[#e7e7e7] bg-[#f9f6f2] px-5 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">
           <Link href="/dashboard">
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 hover:bg-zinc-900 text-zinc-400 hover:text-white"
+              className="h-8 w-8 hover:bg-[#f4eee5] text-[#4e4d4c] hover:text-[#141414] rounded-[5px] border border-[#e7e7e7] bg-white flex items-center justify-center shadow-none cursor-pointer"
             >
               <ArrowLeft className="w-4 h-4" />
             </Button>
           </Link>
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-violet-600/10 border border-violet-500/20 flex items-center justify-center">
-              <BookOpen className="w-3.5 h-3.5 text-violet-400" />
-            </div>
-            <span className="font-bold text-sm tracking-tight text-white">{room.name}</span>
+          <div className="flex items-center gap-3">
+            {}
+            <svg
+              className="w-5 h-5 text-[#262626] stroke-[1.5]"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+            </svg>
+            <span className="font-sans text-[15px] text-[#141414] tracking-tight font-semibold">{room.name}</span>
           </div>
         </div>
 
-        {/* Tabs Switcher */}
-        <div className="flex items-center bg-zinc-900/60 border border-zinc-800 rounded-xl p-0.5 max-w-[200px]">
+        {}
+        <div className="flex border border-[#e7e7e7] bg-white rounded-[5px] p-0.5 shadow-none gap-0.5">
           <button
             onClick={() => setActiveTab('chat')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+            className={`flex items-center gap-1.5 px-4 py-1.5 text-[13px] font-sans transition-all duration-200 cursor-pointer rounded-[4px] ${
               activeTab === 'chat'
-                ? 'bg-zinc-800 text-white shadow-sm'
-                : 'text-zinc-400 hover:text-zinc-200'
+                ? 'bg-[#141414] text-white font-medium shadow-none'
+                : 'text-[#4e4d4c] hover:text-[#141414] hover:bg-[#f4eee5]'
             }`}
           >
             <MessageSquare className="w-3.5 h-3.5" />
@@ -389,10 +436,10 @@ export function RoomClient({
           </button>
           <button
             onClick={() => setActiveTab('history')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+            className={`flex items-center gap-1.5 px-4 py-1.5 text-[13px] font-sans transition-all duration-200 cursor-pointer rounded-[4px] ${
               activeTab === 'history'
-                ? 'bg-zinc-800 text-white shadow-sm'
-                : 'text-zinc-400 hover:text-zinc-200'
+                ? 'bg-[#141414] text-white font-medium shadow-none'
+                : 'text-[#4e4d4c] hover:text-[#141414] hover:bg-[#f4eee5]'
             }`}
           >
             <History className="w-3.5 h-3.5" />
@@ -400,15 +447,15 @@ export function RoomClient({
           </button>
         </div>
 
-        {/* Mobile menu trigger for sidebar */}
+        {}
         <div className="lg:hidden">
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8 text-zinc-400">
+              <Button variant="ghost" size="icon" className="h-8.5 w-8.5 text-[#141414] hover:bg-[#f4eee5] rounded-[5px] border border-[#e7e7e7] bg-white cursor-pointer shadow-none">
                 <Menu className="w-5 h-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="p-0 border-zinc-800 bg-zinc-950 w-80 text-white">
+            <SheetContent side="right" className="p-0 border-l border-[#e7e7e7] bg-[#f9f6f2] w-80 text-[#141414] shadow-none rounded-none">
               <RoomSidebar
                 room={room}
                 members={members}
@@ -421,9 +468,9 @@ export function RoomClient({
         </div>
       </header>
 
-      {/* Main Content Area */}
+      {}
       <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
-        {/* Left Side: Room Info, Members List (Visible on Large Screens) */}
+        {}
         <div className="hidden lg:block h-full">
           <RoomSidebar
             room={room}
@@ -434,30 +481,53 @@ export function RoomClient({
           />
         </div>
 
-        {/* Middle: Timer & Chat or History */}
-        <div className="flex-1 flex flex-col h-full overflow-hidden">
-          <StudyTimer
-            roomId={room.id}
-            currentUserId={currentUser.id}
-            activeSession={activeSession}
-            members={members}
-            onStartSession={handleStartSession}
-            onEndSession={handleEndSession}
-          />
-          {activeTab === 'chat' ? (
-            <RoomChat
+        {}
+        <div id="middle-container" className="flex-1 flex flex-col h-full overflow-hidden">
+          <div 
+            style={activeTab === 'history' ? { height: `${timerHeight}px` } : undefined} 
+            className={`overflow-y-auto shrink-0 ${activeTab === 'history' ? '' : 'h-auto max-h-[250px]'} ${isDragging ? 'select-none pointer-events-none' : ''}`}
+          >
+            <StudyTimer
               roomId={room.id}
               currentUserId={currentUser.id}
-              messages={messages}
-              initialMessages={initialMessages}
-              onSendMessage={handleSendMessage}
+              activeSession={activeSession}
+              members={members}
+              onStartSession={handleStartSession}
+              onEndSession={handleEndSession}
             />
-          ) : (
-            <RoomHistory roomId={room.id} members={members} />
+          </div>
+
+          {}
+          {activeTab === 'history' && (
+            <div
+              onMouseDown={handleMouseDown}
+              className={`h-2 bg-[#f9f6f2] border-t border-b border-[#e7e7e7] hover:bg-[#e7e7e7] active:bg-[#0A7C6E]/20 cursor-row-resize transition-colors flex items-center justify-center select-none shrink-0 group ${
+                isDragging ? 'bg-[#0A7C6E]/10 border-t-[#0A7C6E]/30 border-b-[#0A7C6E]/30' : ''
+              }`}
+              title="Drag to resize panels"
+            >
+              <div className={`w-10 h-0.5 rounded-full bg-[#c0c0c0] group-hover:bg-[#737373] transition-colors ${
+                isDragging ? 'bg-[#0A7C6E]' : ''
+              }`} />
+            </div>
           )}
+
+          <div className="flex-1 flex flex-col overflow-hidden min-h-0">
+            {activeTab === 'chat' ? (
+              <RoomChat
+                roomId={room.id}
+                currentUserId={currentUser.id}
+                messages={messages}
+                initialMessages={initialMessages}
+                onSendMessage={handleSendMessage}
+              />
+            ) : (
+              <RoomHistory roomId={room.id} members={members} />
+            )}
+          </div>
         </div>
 
-        {/* Right Side: Activity Log Feed */}
+        {}
         <div className="hidden lg:block h-full">
           <ActivityLog activities={activities} />
         </div>
@@ -465,3 +535,4 @@ export function RoomClient({
     </div>
   )
 }
+

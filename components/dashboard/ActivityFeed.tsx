@@ -10,6 +10,8 @@ import {
   UserPlus,
   UserMinus,
   Activity,
+  BookOpen,
+  Timer,
 } from 'lucide-react'
 
 interface ActivityItem {
@@ -41,7 +43,6 @@ interface ActivityFeedProps {
 }
 
 export function ActivityFeed({ activities, roomSummaries }: ActivityFeedProps) {
-  // Map actions to descriptive message strings
   const getActionDetails = (item: ActivityItem) => {
     const name = item.profiles?.full_name || item.profiles?.username || 'Someone'
     const metadata = item.metadata || {}
@@ -49,42 +50,46 @@ export function ActivityFeed({ activities, roomSummaries }: ActivityFeedProps) {
     switch (item.action) {
       case 'room_created':
         return {
-          icon: <Home className="w-3.5 h-3.5 text-blue-400" />,
-          bgColor: 'bg-blue-500/10 border-blue-500/15',
+          icon: <Home className="w-3.5 h-3.5 text-[#0A7C6E]" />,
+          iconBg: 'bg-[#e6f4f2]',
           text: (
             <span>
-              🏠 <span className="font-semibold text-zinc-200">@{name}</span> created the room
+              <span className="font-semibold text-[#141414]">{name}</span>
+              <span className="text-[#4e4d4c]"> created the room</span>
             </span>
           ),
         }
       case 'member_joined':
         return {
-          icon: <UserPlus className="w-3.5 h-3.5 text-emerald-400" />,
-          bgColor: 'bg-emerald-500/10 border-emerald-500/15',
+          icon: <UserPlus className="w-3.5 h-3.5 text-[#0A7C6E]" />,
+          iconBg: 'bg-[#e6f4f2]',
           text: (
             <span>
-              👋 <span className="font-semibold text-zinc-200">@{name}</span> joined the room
+              <span className="font-semibold text-[#141414]">{name}</span>
+              <span className="text-[#4e4d4c]"> joined the room</span>
             </span>
           ),
         }
       case 'member_left':
         return {
-          icon: <UserMinus className="w-3.5 h-3.5 text-zinc-400" />,
-          bgColor: 'bg-zinc-800/60 border-zinc-700/60',
+          icon: <UserMinus className="w-3.5 h-3.5 text-[#a1a1a1]" />,
+          iconBg: 'bg-[#f4eee5]',
           text: (
             <span>
-              🚪 <span className="font-semibold text-zinc-300">@{name}</span> left the room
+              <span className="font-semibold text-[#4e4d4c]">{name}</span>
+              <span className="text-[#737373]"> left the room</span>
             </span>
           ),
         }
       case 'session_started':
         const mins = metadata?.duration_minutes ?? '25'
         return {
-          icon: <Play className="w-3.5 h-3.5 text-violet-400" />,
-          bgColor: 'bg-violet-500/10 border-violet-500/15',
+          icon: <Play className="w-3.5 h-3.5 text-[#0A7C6E]" />,
+          iconBg: 'bg-[#e6f4f2]',
           text: (
             <span>
-              ▶️ <span className="font-semibold text-zinc-200">@{name}</span> started a session ({mins} mins)
+              <span className="font-semibold text-[#141414]">{name}</span>
+              <span className="text-[#4e4d4c]"> started a {mins} min session</span>
             </span>
           ),
         }
@@ -92,47 +97,46 @@ export function ActivityFeed({ activities, roomSummaries }: ActivityFeedProps) {
         const elapsedSecs = metadata?.actual_duration_seconds ?? 0
         const elapsedMins = Math.max(1, Math.round(elapsedSecs / 60))
         return {
-          icon: <Square className="w-3.5 h-3.5 text-amber-500" />,
-          bgColor: 'bg-amber-500/10 border-amber-500/15',
+          icon: <Square className="w-3.5 h-3.5 text-[#737373]" />,
+          iconBg: 'bg-[#f4eee5]',
           text: (
-            <span>
-              ⏹️ Session ended ({elapsedMins} mins completed)
-            </span>
+            <span className="text-[#4e4d4c]">Session ended — {elapsedMins} min completed</span>
           ),
         }
       case 'session_completed':
         const compSecs = metadata?.actual_duration_seconds ?? (metadata?.duration_minutes ? metadata.duration_minutes * 60 : 1500)
         const compMins = Math.round(compSecs / 60)
         return {
-          icon: <CheckCircle2 className="w-3.5 h-3.5 text-emerald-450" />,
-          bgColor: 'bg-emerald-500/10 border-emerald-500/15',
+          icon: <CheckCircle2 className="w-3.5 h-3.5 text-[#0A7C6E]" />,
+          iconBg: 'bg-[#e6f4f2]',
           text: (
             <span>
-              ✅ Session completed! ({compMins} mins)
+              <span className="font-semibold text-[#0A7C6E]">Session completed!</span>
+              <span className="text-[#4e4d4c]"> {compMins} min</span>
             </span>
           ),
         }
       default:
         return {
-          icon: <Activity className="w-3.5 h-3.5 text-zinc-500" />,
-          bgColor: 'bg-zinc-900 border-zinc-800',
+          icon: <Activity className="w-3.5 h-3.5 text-[#0A7C6E]" />,
+          iconBg: 'bg-[#e6f4f2]',
           text: (
             <span>
-              ⚡ <span className="font-semibold text-zinc-200">@{name}</span> performed action: {item.action}
+              <span className="font-semibold text-[#141414]">{name}</span>
+              <span className="text-[#4e4d4c]"> {item.action.replace(/_/g, ' ')}</span>
             </span>
           ),
         }
     }
   }
 
-  // Format relative timestamp
   const getRelativeTime = (isoString: string) => {
     try {
       const then = new Date(isoString).getTime()
       const now = new Date().getTime()
       const diffMs = now - then
 
-      if (diffMs < 5000) return 'just now'
+      if (diffMs < 5000) return 'Just now'
       const diffSecs = Math.round(diffMs / 1000)
       if (diffSecs < 60) return `${diffSecs}s ago`
       const diffMins = Math.round(diffSecs / 60)
@@ -154,40 +158,51 @@ export function ActivityFeed({ activities, roomSummaries }: ActivityFeedProps) {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Activity Log Feed */}
-      <Card className="border border-zinc-800 bg-zinc-900/30 backdrop-blur-sm">
-        <CardHeader className="p-5 pb-2">
-          <CardTitle className="text-xs font-bold uppercase tracking-wider text-zinc-450 flex items-center gap-1.5">
-            <Activity className="w-4 h-4 text-violet-400" />
-            Recent Activity Feed
+    <div className="space-y-4">
+      {/* Recent Activity Feed */}
+      <Card className="border border-[#e7e7e7] bg-white shadow-none rounded-[10px]">
+        <CardHeader className="p-5 pb-3 flex flex-row items-center gap-2">
+          <div className="w-7 h-7 rounded-[5px] bg-[#e6f4f2] flex items-center justify-center shrink-0">
+            <Activity className="w-3.5 h-3.5 text-[#0A7C6E]" />
+          </div>
+          <CardTitle className="text-[13px] font-semibold text-[#141414]">
+            Recent Activity
           </CardTitle>
         </CardHeader>
-        <CardContent className="p-5 pt-2">
+        <CardContent className="p-5 pt-0">
           {activities.length === 0 ? (
-            <p className="text-xs text-zinc-550 text-center py-4">No recent activity across rooms.</p>
+            <div className="py-8 text-center">
+              <p className="text-[13px] text-[#737373]">No recent activity across rooms.</p>
+            </div>
           ) : (
-            <div className="relative border-l border-zinc-800/80 ml-2.5 pl-5 space-y-5 py-1">
+            <div className="space-y-3">
               {activities.map((item) => {
                 const config = getActionDetails(item)
 
                 return (
-                  <div key={item.id} className="relative">
-                    {/* Timeline icon */}
-                    <div className={`absolute -left-[30px] top-0.5 w-6 h-6 rounded-full border flex items-center justify-center ${config.bgColor} shadow-sm shrink-0`}>
+                  <div key={item.id} className="flex items-start gap-3">
+                    {/* Icon */}
+                    <div className={`w-7 h-7 rounded-[5px] flex items-center justify-center shrink-0 mt-0.5 ${config.iconBg}`}>
                       {config.icon}
                     </div>
 
-                    <div className="text-xs text-zinc-450 leading-tight">
-                      {config.text}
-                      {item.room_name && (
-                        <span className="text-[10px] text-violet-400/90 font-medium block mt-0.5">
-                          in {item.room_name}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[13px] leading-snug">
+                        {config.text}
+                      </p>
+                      <div className="flex items-center gap-1.5 mt-1">
+                        {item.room_name && (
+                          <span className="text-[11px] text-[#0A7C6E] font-medium truncate">
+                            #{item.room_name}
+                          </span>
+                        )}
+                        {item.room_name && (
+                          <span className="text-[#e7e7e7]">·</span>
+                        )}
+                        <span className="text-[11px] text-[#a1a1a1] flex items-center gap-1" suppressHydrationWarning>
+                          <Clock className="w-3 h-3" />
+                          {getRelativeTime(item.created_at)}
                         </span>
-                      )}
-                      <div className="flex items-center gap-1 text-[9px] text-zinc-600 mt-1 font-mono" suppressHydrationWarning>
-                        <Clock className="w-2.5 h-2.5" />
-                        {getRelativeTime(item.created_at)}
                       </div>
                     </div>
                   </div>
@@ -198,34 +213,45 @@ export function ActivityFeed({ activities, roomSummaries }: ActivityFeedProps) {
         </CardContent>
       </Card>
 
-      {/* Room study summaries list */}
-      <Card className="border border-zinc-800 bg-zinc-900/30 backdrop-blur-sm">
-        <CardHeader className="p-5 pb-2">
-          <CardTitle className="text-xs font-bold uppercase tracking-wider text-zinc-450">
-            My Rooms Summary
+      {/* My Room Summaries */}
+      <Card className="border border-[#e7e7e7] bg-white shadow-none rounded-[10px]">
+        <CardHeader className="p-5 pb-3 flex flex-row items-center gap-2">
+          <div className="w-7 h-7 rounded-[5px] bg-[#e6f4f2] flex items-center justify-center shrink-0">
+            <BookOpen className="w-3.5 h-3.5 text-[#0A7C6E]" />
+          </div>
+          <CardTitle className="text-[13px] font-semibold text-[#141414]">
+            My Room Summary
           </CardTitle>
         </CardHeader>
-        <CardContent className="p-5 pt-2">
+        <CardContent className="p-5 pt-0">
           {roomSummaries.length === 0 ? (
-            <p className="text-xs text-zinc-550 text-center py-4">No rooms joined yet.</p>
+            <div className="py-8 text-center">
+              <p className="text-[13px] text-[#737373]">No rooms joined yet.</p>
+            </div>
           ) : (
-            <div className="divide-y divide-zinc-850">
+            <div className="space-y-2">
               {roomSummaries.map((room) => (
-                <div key={room.id} className="py-3 first:pt-0 last:pb-0 flex items-center justify-between text-xs gap-3">
-                  <div className="min-w-0">
-                    <span className="font-semibold text-zinc-200 block truncate leading-tight">
+                <div
+                  key={room.id}
+                  className="flex items-center justify-between p-3 rounded-[5px] bg-[#f9f6f2] border border-[#e7e7e7] hover:border-[#0A7C6E] transition-colors duration-200"
+                >
+                  <div className="min-w-0 flex-1">
+                    <span className="text-[13px] font-semibold text-[#141414] block truncate leading-snug">
                       {room.name}
                     </span>
                     {room.subject && (
-                      <span className="text-[10px] text-zinc-500 font-medium">{room.subject}</span>
+                      <span className="text-[11px] text-[#737373] mt-0.5 block truncate">{room.subject}</span>
                     )}
                   </div>
 
-                  <div className="text-right shrink-0">
-                    <span className="font-mono text-zinc-300 font-bold block leading-none">
-                      {formatStudyTimeText(room.totalStudyTimeSeconds)}
-                    </span>
-                    <span className="text-[9px] text-zinc-550 font-medium">
+                  <div className="text-right shrink-0 ml-3">
+                    <div className="flex items-center gap-1.5 justify-end">
+                      <Timer className="w-3 h-3 text-[#0A7C6E]" />
+                      <span className="text-[13px] font-semibold text-[#141414]">
+                        {formatStudyTimeText(room.totalStudyTimeSeconds)}
+                      </span>
+                    </div>
+                    <span className="text-[11px] text-[#737373] mt-0.5 block">
                       {room.totalSessions} session{room.totalSessions !== 1 ? 's' : ''}
                     </span>
                   </div>

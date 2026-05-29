@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Trophy, Medal, Crown } from 'lucide-react'
+import { Trophy, Medal } from 'lucide-react'
 
 interface LeaderboardMember {
   userId: string
@@ -31,49 +31,51 @@ export function Leaderboard({ leaderboards, currentUserId }: LeaderboardProps) {
     return `${mins}m`
   }
 
-  // Get rank icons for top 3
-  const getRankIcon = (index: number) => {
-    switch (index) {
-      case 0:
-        return <Crown className="w-4 h-4 text-amber-400 fill-amber-400/10" />
-      case 1:
-        return <Medal className="w-4 h-4 text-slate-350" />
-      case 2:
-        return <Medal className="w-4 h-4 text-amber-600" />
-      default:
-        return null
-    }
+  const rankColors: Record<number, string> = {
+    1: 'text-amber-500',
+    2: 'text-[#a1a1a1]',
+    3: 'text-amber-700',
+  }
+
+  const rankSymbols: Record<number, string> = {
+    1: '🥇',
+    2: '🥈',
+    3: '🥉',
   }
 
   return (
-    <Card className="border border-zinc-800 bg-zinc-900/30 backdrop-blur-sm">
-      <CardHeader className="p-5 pb-2 flex flex-row items-center gap-2">
-        <Trophy className="w-4.5 h-4.5 text-violet-400" />
-        <CardTitle className="text-xs font-bold uppercase tracking-wider text-zinc-450">
-          Leaderboards (Top Members)
+    <Card className="border border-[#e7e7e7] bg-white shadow-none rounded-[10px]">
+      <CardHeader className="p-5 pb-3 flex flex-row items-center gap-2">
+        <div className="w-7 h-7 rounded-[5px] bg-[#fffbeb] flex items-center justify-center shrink-0">
+          <Trophy className="w-3.5 h-3.5 text-amber-500" />
+        </div>
+        <CardTitle className="text-[13px] font-semibold text-[#141414]">
+          Top Members
         </CardTitle>
       </CardHeader>
-      <CardContent className="p-5 pt-2 space-y-6">
+      <CardContent className="p-5 pt-0 space-y-5">
         {leaderboards.length === 0 ? (
-          <p className="text-xs text-zinc-550 text-center py-4">Join a study room to view leaderboards.</p>
+          <div className="py-8 text-center">
+            <p className="text-[13px] text-[#737373]">Join a study room to view leaderboards.</p>
+          </div>
         ) : (
           leaderboards.map((board) => (
-            <div key={board.roomId} className="space-y-2.5">
-              {/* Room name header */}
-              <div className="flex items-center justify-between border-b border-zinc-800/80 pb-1.5">
-                <span className="text-xs font-bold text-zinc-300 leading-tight">
+            <div key={board.roomId} className="space-y-2">
+              {/* Room name label */}
+              <div className="flex items-center justify-between border-b border-[#e7e7e7] pb-2">
+                <span className="text-[12px] font-semibold text-[#141414] truncate max-w-[70%]">
                   {board.roomName}
                 </span>
-                <span className="text-[9px] uppercase font-black text-violet-400 tracking-wider">
-                  Leaderboard
+                <span className="text-[11px] text-[#a1a1a1]">
+                  Rankings
                 </span>
               </div>
 
               {/* Members ranked list */}
               {board.members.length === 0 ? (
-                <p className="text-[10px] text-zinc-650 italic">No study logs yet for this room.</p>
+                <p className="text-[13px] text-[#737373] py-2">No study logs yet.</p>
               ) : (
-                <div className="space-y-2">
+                <div className="space-y-1.5">
                   {board.members.slice(0, 3).map((member, index) => {
                     const isSelf = member.userId === currentUserId
                     const displayName = member.fullName || member.username || 'Student'
@@ -82,46 +84,37 @@ export function Leaderboard({ leaderboards, currentUserId }: LeaderboardProps) {
                     return (
                       <div
                         key={member.userId}
-                        className={`flex items-center justify-between p-2 rounded-xl border text-xs transition-colors ${
+                        className={`flex items-center justify-between px-3 py-2.5 rounded-[5px] border transition-all duration-200 ${
                           isSelf
-                            ? 'bg-violet-600/10 border-violet-500/30 shadow-sm'
-                            : 'bg-zinc-950/20 border-zinc-900/60 hover:bg-zinc-950/45 hover:border-zinc-850'
+                            ? 'bg-[#e6f4f2] border-[#0A7C6E]'
+                            : 'bg-[#f9f6f2] border-[#e7e7e7] hover:border-[#0A7C6E]'
                         }`}
                       >
                         <div className="flex items-center gap-2.5 min-w-0">
-                          {/* Rank indicator */}
-                          <div className="w-5 flex items-center justify-center shrink-0">
-                            {getRankIcon(index) || (
-                              <span className="text-[10px] font-bold text-zinc-600 font-mono">
-                                #{rank}
-                              </span>
-                            )}
-                          </div>
+                          {/* Rank */}
+                          <span className="text-[14px] shrink-0 leading-none">
+                            {rankSymbols[rank] || `#${rank}`}
+                          </span>
 
                           {/* Avatar */}
-                          <Avatar className="w-6 h-6 border border-zinc-800 shrink-0">
-                            <AvatarImage src={member.avatarUrl || undefined} />
-                            <AvatarFallback className="bg-zinc-900 text-zinc-500 text-[9px] font-bold">
+                          <Avatar className="w-6 h-6 border border-[#e7e7e7] shrink-0 rounded-[5px]">
+                            <AvatarImage src={member.avatarUrl || undefined} className="rounded-[5px] object-cover" />
+                            <AvatarFallback className="bg-[#f4eee5] text-[#141414] text-[9px] font-semibold rounded-[5px]">
                               {displayName.charAt(0).toUpperCase()}
                             </AvatarFallback>
                           </Avatar>
 
-                          {/* Name details */}
-                          <span
-                            className={`font-semibold truncate ${
-                              isSelf ? 'text-violet-300' : 'text-zinc-200'
-                            }`}
-                          >
-                            @{member.username} {isSelf && '(You)'}
+                          {/* Name */}
+                          <span className={`text-[13px] truncate ${isSelf ? 'font-semibold text-[#0A7C6E]' : 'font-medium text-[#262626]'}`}>
+                            {displayName}
+                            {isSelf && <span className="text-[11px] font-normal ml-1 text-[#0A7C6E] opacity-70">(you)</span>}
                           </span>
                         </div>
 
-                        {/* Accumulated study time */}
-                        <div className="text-right shrink-0">
-                          <span className="font-mono text-zinc-300 font-extrabold">
-                            {formatTime(member.totalTimeSeconds)}
-                          </span>
-                        </div>
+                        {/* Study time */}
+                        <span className={`text-[13px] font-semibold shrink-0 ${isSelf ? 'text-[#0A7C6E]' : 'text-[#141414]'}`}>
+                          {formatTime(member.totalTimeSeconds)}
+                        </span>
                       </div>
                     )
                   })}

@@ -3,7 +3,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
   Calendar,
@@ -11,7 +10,6 @@ import {
   Sparkles,
   Timer,
   CheckCircle2,
-  AlertCircle,
   Play,
   Square,
   Home,
@@ -67,7 +65,7 @@ export function RoomHistory({ roomId, members }: RoomHistoryProps) {
   const fetchInitialData = async () => {
     setLoading(true)
     try {
-      // 1. Fetch study sessions (all past sessions)
+      
       const { data: sessData, error: sessErr } = await supabase
         .from('study_sessions')
         .select(`
@@ -95,7 +93,7 @@ export function RoomHistory({ roomId, members }: RoomHistoryProps) {
       }))
       setSessions(mappedSessions)
 
-      // 2. Fetch first page of activity timeline
+      
       const { data: actData, error: actErr } = await supabase
         .from('activity_log')
         .select(`
@@ -133,7 +131,7 @@ export function RoomHistory({ roomId, members }: RoomHistoryProps) {
   useEffect(() => {
     fetchInitialData()
 
-    // Setup realtime subscription for study_sessions to auto-refresh list on active session updates
+    
     const sessionSub = supabase
       .channel(`room_history_sessions:${roomId}`)
       .on(
@@ -145,7 +143,7 @@ export function RoomHistory({ roomId, members }: RoomHistoryProps) {
           filter: `room_id=eq.${roomId}`,
         },
         async () => {
-          // Re-fetch sessions list to stay accurate
+          
           const { data } = await supabase
             .from('study_sessions')
             .select(`
@@ -176,7 +174,7 @@ export function RoomHistory({ roomId, members }: RoomHistoryProps) {
       )
       .subscribe()
 
-    // Setup realtime subscription for activity_log to auto-add new timeline entries
+    
     const activitySub = supabase
       .channel(`room_history_activities:${roomId}`)
       .on(
@@ -189,9 +187,9 @@ export function RoomHistory({ roomId, members }: RoomHistoryProps) {
         },
         async (payload) => {
           const newAct = payload.new as any
-          if (newAct.action === 'message_sent') return // ignore noisy messages
+          if (newAct.action === 'message_sent') return 
 
-          // Fetch profile of the actor
+          
           const { data: prof } = await supabase
             .from('profiles')
             .select('username, full_name')
@@ -273,7 +271,7 @@ export function RoomHistory({ roomId, members }: RoomHistoryProps) {
     }
   }
 
-  // Derived metrics
+  
   const totalSessionsCount = useMemo(() => {
     return sessions.filter((s) => !s.is_active).length
   }, [sessions])
@@ -292,7 +290,7 @@ export function RoomHistory({ roomId, members }: RoomHistoryProps) {
     return `${mins}m`
   }, [sessions])
 
-  // Helper formatting for durations
+  
   const formatSessionDuration = (secs: number) => {
     const hrs = Math.floor(secs / 3600)
     const mins = Math.floor((secs % 3600) / 60)
@@ -308,13 +306,13 @@ export function RoomHistory({ roomId, members }: RoomHistoryProps) {
     return parts.join(' ')
   }
 
-  // Formatting relative timestamp
+  
   const getRelativeTime = (isoString: string) => {
     const then = new Date(isoString).getTime()
     const now = new Date().getTime()
     const diffMs = now - then
 
-    if (diffMs < 5000) return 'just now'
+    if (diffMs < 5000) return 'Just now'
     const diffSecs = Math.round(diffMs / 1000)
     if (diffSecs < 60) return `${diffSecs}s ago`
     const diffMins = Math.round(diffSecs / 60)
@@ -325,7 +323,7 @@ export function RoomHistory({ roomId, members }: RoomHistoryProps) {
     return `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`
   }
 
-  // Formatting calendar dates
+  
   const formatLocalDate = (isoString: string) => {
     const dateObj = new Date(isoString)
     return dateObj.toLocaleDateString([], {
@@ -336,7 +334,7 @@ export function RoomHistory({ roomId, members }: RoomHistoryProps) {
     })
   }
 
-  // Group timeline activities by date ("Today", "Yesterday", or "MMM DD, YYYY")
+  
   const groupedActivities = useMemo(() => {
     const groups: { [key: string]: ActivityItem[] } = {}
     const today = new Date().toDateString()
@@ -369,39 +367,39 @@ export function RoomHistory({ roomId, members }: RoomHistoryProps) {
     return Object.entries(groups)
   }, [activities])
 
-  // Map timeline events to icons and text
+  
   const renderTimelineEvent = (act: ActivityItem) => {
     const metadata = act.metadata || {}
-    const name = act.profiles?.full_name || act.profiles?.username || 'Someone'
+    const name = act.profiles?.username || 'Someone'
 
     switch (act.action) {
       case 'room_created':
         return {
-          icon: <Home className="w-3.5 h-3.5 text-blue-400" />,
-          color: 'bg-blue-500/10 border-blue-500/25',
+          icon: <Home className="w-3 h-3 text-[#262626]" />,
+          color: 'bg-white border-[#e7e7e7]',
           text: (
             <span>
-              🏠 <span className="font-semibold text-white">@{name}</span> created this room
+              <span className="text-[#141414] font-semibold">@{name}</span> created this room
             </span>
           ),
         }
       case 'member_joined':
         return {
-          icon: <UserPlus className="w-3.5 h-3.5 text-emerald-400" />,
-          color: 'bg-emerald-500/10 border-emerald-500/25',
+          icon: <UserPlus className="w-3 h-3 text-[#262626]" />,
+          color: 'bg-white border-[#e7e7e7]',
           text: (
             <span>
-              👋 <span className="font-semibold text-white">@{name}</span> joined the room
+              <span className="text-[#141414] font-semibold">@{name}</span> joined the room
             </span>
           ),
         }
       case 'member_left':
         return {
-          icon: <UserMinus className="w-3.5 h-3.5 text-zinc-500" />,
-          color: 'bg-zinc-800 border-zinc-700',
+          icon: <UserMinus className="w-3 h-3 text-[#737373]" />,
+          color: 'bg-white border-[#e7e7e7]',
           text: (
             <span>
-              🚪 <span className="font-semibold text-zinc-400">@{name}</span> left the room
+              <span className="text-[#737373]">@{name}</span> left the room
             </span>
           ),
         }
@@ -409,11 +407,11 @@ export function RoomHistory({ roomId, members }: RoomHistoryProps) {
         const startMins = metadata?.duration_minutes ?? '25'
         const starter = metadata?.started_by_username || name
         return {
-          icon: <Play className="w-3.5 h-3.5 text-violet-400" />,
-          color: 'bg-violet-500/10 border-violet-500/25',
+          icon: <Play className="w-3 h-3 text-[#262626]" />,
+          color: 'bg-white border-[#e7e7e7]',
           text: (
             <span>
-              ▶️ <span className="font-semibold text-white">@{starter}</span> started a session ({startMins} mins)
+              <span className="text-[#141414] font-semibold">@{starter}</span> started a session ({startMins} mins)
             </span>
           ),
         }
@@ -421,11 +419,11 @@ export function RoomHistory({ roomId, members }: RoomHistoryProps) {
         const actualSecs = metadata?.actual_duration_seconds ?? 0
         const actualMins = Math.max(1, Math.round(actualSecs / 60))
         return {
-          icon: <Square className="w-3.5 h-3.5 text-amber-500" />,
-          color: 'bg-amber-500/10 border-amber-500/25',
+          icon: <Square className="w-3 h-3 text-[#262626]" />,
+          color: 'bg-white border-[#e7e7e7]',
           text: (
             <span>
-              ⏹️ Session ended early ({actualMins} mins completed)
+              Session ended early ({actualMins} mins completed)
             </span>
           ),
         }
@@ -433,21 +431,21 @@ export function RoomHistory({ roomId, members }: RoomHistoryProps) {
         const compSecs = metadata?.actual_duration_seconds ?? (metadata?.duration_minutes ? metadata.duration_minutes * 60 : 1500)
         const compMins = Math.round(compSecs / 60)
         return {
-          icon: <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />,
-          color: 'bg-emerald-500/10 border-emerald-500/25',
+          icon: <CheckCircle2 className="w-3 h-3 text-[#0A7C6E]" />,
+          color: 'bg-[#0A7C6E]/10 border-[#0A7C6E]/30',
           text: (
-            <span>
-              ✅ Session completed! ({compMins} mins)
+            <span className="text-[#141414] font-semibold">
+              Session completed! ({compMins} mins)
             </span>
           ),
         }
       default:
         return {
-          icon: <Clock className="w-3.5 h-3.5 text-zinc-500" />,
-          color: 'bg-zinc-900 border-zinc-800',
+          icon: <Clock className="w-3.5 h-3.5 text-[#262626]" />,
+          color: 'bg-white border-[#e7e7e7]',
           text: (
             <span>
-              ⚡ <span className="font-semibold text-white">@{name}</span> performed action: {act.action}
+              <span className="text-[#141414] font-semibold">@{name}</span> performed action: {act.action}
             </span>
           ),
         }
@@ -456,121 +454,129 @@ export function RoomHistory({ roomId, members }: RoomHistoryProps) {
 
   if (loading) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center p-8 text-zinc-400 bg-zinc-950">
-        <Loader2 className="w-8 h-8 text-violet-500 animate-spin mb-3" />
-        <p className="text-sm">Loading room history…</p>
+      <div className="flex-1 flex flex-col items-center justify-center p-8 text-[#4e4d4c] bg-[#f9f6f2] font-sans">
+        <Loader2 className="w-6 h-6 text-[#141414] animate-spin mb-3" />
+        <p className="text-[14px]">Loading room history…</p>
       </div>
     )
   }
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-zinc-950 text-white space-y-8">
-      {/* Metrics Section */}
+    <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-[#f9f6f2] text-[#4e4d4c] space-y-8 text-[14px] font-sans">
+      {}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-        <div className="rounded-xl border border-zinc-800/80 bg-zinc-900/40 p-4 flex items-center gap-4">
-          <div className="w-10 h-10 rounded-lg bg-violet-500/10 flex items-center justify-center border border-violet-500/20">
-            <Timer className="w-5 h-5 text-violet-400" />
-          </div>
-          <div>
-            <span className="text-[10px] uppercase font-bold text-zinc-500 tracking-wider">
+        {}
+        <div className="bg-white border border-[#e7e7e7] rounded-[10px] p-5 flex flex-col gap-4 shadow-none">
+          <div className="flex items-center justify-between">
+            <span className="text-[12px] text-[#737373] uppercase tracking-wider font-semibold">
               Total Sessions
             </span>
-            <h4 className="text-2xl font-bold text-white leading-none mt-1">
+            <div className="w-8 h-8 rounded-[5px] bg-[#f4eee5] border border-[#e7e7e7] flex items-center justify-center">
+              <Timer className="w-4 h-4 text-[#262626]" />
+            </div>
+          </div>
+          <div>
+            <h4 className="text-[#141414] text-heading-sm font-semibold tracking-tight">
               {totalSessionsCount}
             </h4>
           </div>
         </div>
 
-        <div className="rounded-xl border border-zinc-800/80 bg-zinc-900/40 p-4 flex items-center gap-4">
-          <div className="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
-            <Clock className="w-5 h-5 text-emerald-400" />
-          </div>
-          <div>
-            <span className="text-[10px] uppercase font-bold text-zinc-500 tracking-wider">
+        {}
+        <div className="bg-white border border-[#e7e7e7] rounded-[10px] p-5 flex flex-col gap-4 shadow-none">
+          <div className="flex items-center justify-between">
+            <span className="text-[12px] text-[#737373] uppercase tracking-wider font-semibold">
               Time Accumulated
             </span>
-            <h4 className="text-2xl font-bold text-white leading-none mt-1">
+            <div className="w-8 h-8 rounded-[5px] bg-[#f4eee5] border border-[#e7e7e7] flex items-center justify-center">
+              <Clock className="w-4 h-4 text-[#262626]" />
+            </div>
+          </div>
+          <div>
+            <h4 className="text-[#141414] text-heading-sm font-semibold tracking-tight">
               {totalStudyTimeText}
             </h4>
           </div>
         </div>
 
-        <div className="rounded-xl border border-zinc-800/80 bg-zinc-900/40 p-4 flex items-center gap-4 sm:col-span-2 md:col-span-1">
-          <div className="w-10 h-10 rounded-lg bg-indigo-500/10 flex items-center justify-center border border-indigo-500/20">
-            <Sparkles className="w-5 h-5 text-indigo-400" />
-          </div>
-          <div>
-            <span className="text-[10px] uppercase font-bold text-zinc-500 tracking-wider">
+        {}
+        <div className="bg-white border border-[#e7e7e7] rounded-[10px] p-5 flex flex-col gap-4 sm:col-span-2 md:col-span-1 shadow-none">
+          <div className="flex items-center justify-between">
+            <span className="text-[12px] text-[#737373] uppercase tracking-wider font-semibold">
               Group Size
             </span>
-            <h4 className="text-2xl font-bold text-white leading-none mt-1">
+            <div className="w-8 h-8 rounded-[5px] bg-[#f4eee5] border border-[#e7e7e7] flex items-center justify-center">
+              <Sparkles className="w-4 h-4 text-[#262626]" />
+            </div>
+          </div>
+          <div>
+            <h4 className="text-[#141414] text-heading-sm font-semibold tracking-tight">
               {members.length} Member{members.length !== 1 ? 's' : ''}
             </h4>
           </div>
         </div>
       </div>
 
-      {/* Study Sessions List */}
+      {}
       <div className="space-y-4">
-        <div className="flex items-center gap-2 border-b border-zinc-850 pb-2.5">
-          <Calendar className="w-4.5 h-4.5 text-violet-400" />
-          <h3 className="text-base font-bold text-zinc-200">Study Sessions History</h3>
+        <div className="flex items-center gap-2 border-b border-[#e7e7e7] pb-2.5">
+          <Calendar className="w-4.5 h-4.5 text-[#262626]" />
+          <h3 className="text-heading-sm font-semibold text-[#141414]">Study Sessions History</h3>
         </div>
 
         {sessions.filter(s => !s.is_active).length === 0 ? (
-          <div className="rounded-xl border border-zinc-850 bg-zinc-900/20 p-8 text-center text-zinc-550 text-sm">
+          <div className="border border-[#e7e7e7] bg-white p-8 rounded-[10px] text-center text-[#737373] text-[14px]">
             No completed study sessions recorded yet. Start a session from the timer panel!
           </div>
         ) : (
-          <div className="overflow-x-auto rounded-xl border border-zinc-800 bg-zinc-900/25">
-            <table className="w-full text-left border-collapse text-xs">
+          <div className="overflow-x-auto border border-[#e7e7e7] bg-white shadow-none rounded-[10px]">
+            <table className="w-full text-left border-collapse text-[14px]">
               <thead>
-                <tr className="border-b border-zinc-800 text-zinc-500 font-bold tracking-wider uppercase bg-zinc-900/40">
-                  <th className="py-3 px-4">Session</th>
-                  <th className="py-3 px-4">Started By</th>
-                  <th className="py-3 px-4">Date &amp; Time</th>
-                  <th className="py-3 px-4">Duration</th>
-                  <th className="py-3 px-4 text-right">Status</th>
+                <tr className="border-b border-[#e7e7e7] text-[#737373] font-medium bg-[#f4eee5] text-[12px] uppercase">
+                  <th className="py-3.5 px-4 font-semibold">Session</th>
+                  <th className="py-3.5 px-4 font-semibold">Started By</th>
+                  <th className="py-3.5 px-4 font-semibold">Date &amp; Time</th>
+                  <th className="py-3.5 px-4 font-semibold">Duration</th>
+                  <th className="py-3.5 px-4 font-semibold text-right">Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-850 text-zinc-300">
+              <tbody className="divide-y divide-[#e7e7e7] text-[#141414]">
                 {sessions
                   .filter((s) => !s.is_active)
                   .map((s, index, arr) => {
                     const sessionNumber = arr.length - index
                     const starterName = s.profiles?.full_name || s.profiles?.username || 'User'
-                    const isEarlyEnd = s.duration_seconds < (s.duration_seconds || 1500) && s.duration_seconds !== 1500 && s.duration_seconds !== 3000
 
                     return (
-                      <tr key={s.id} className="hover:bg-zinc-900/20 transition-colors">
-                        <td className="py-3 px-4 font-mono font-bold text-violet-400">
+                      <tr key={s.id} className="hover:bg-[#f9f6f2] transition-colors">
+                        <td className="py-3 px-4 font-bold text-[#141414]">
                           #{sessionNumber}
                         </td>
                         <td className="py-3 px-4">
                           <div className="flex items-center gap-2">
-                            <Avatar className="w-5 h-5 border border-zinc-800">
+                            <Avatar className="w-5 h-5 border border-[#e7e7e7] rounded-[5px]">
                               <AvatarImage src={s.profiles?.avatar_url || undefined} />
-                              <AvatarFallback className="bg-zinc-900 text-zinc-500 text-[9px] font-semibold">
+                              <AvatarFallback className="bg-[#f4eee5] text-[#141414] text-[9px] rounded-[5px] font-medium">
                                 {starterName.charAt(0).toUpperCase()}
                               </AvatarFallback>
                             </Avatar>
-                            <span className="font-semibold text-zinc-200">@{s.profiles?.username || 'user'}</span>
+                            <span className="text-[#141414] font-semibold">@{s.profiles?.username || 'user'}</span>
                           </div>
                         </td>
-                        <td className="py-3 px-4 font-mono text-zinc-400" suppressHydrationWarning>
+                        <td className="py-3 px-4 text-[#4e4d4c]" suppressHydrationWarning>
                           {formatLocalDate(s.started_at)}
                         </td>
-                        <td className="py-3 px-4 font-mono font-semibold">
+                        <td className="py-3 px-4 text-[#141414]">
                           {formatSessionDuration(s.duration_seconds)}
                         </td>
                         <td className="py-3 px-4 text-right">
                           {s.duration_seconds >= 1490 && s.duration_seconds !== 0 ? (
-                            <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">
-                              Completed ✅
+                            <span className="inline-flex items-center gap-1 text-[11px] text-[#0A7C6E] bg-[#0A7C6E]/10 border border-[#0A7C6E]/30 px-2 py-0.5 rounded-[52px] font-medium uppercase">
+                              Completed
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-full">
-                              Ended Early ⚠️
+                            <span className="inline-flex items-center gap-1 text-[11px] text-[#737373] bg-[#f4eee5] border border-[#e7e7e7] px-2 py-0.5 rounded-[52px] font-medium uppercase">
+                              Ended Early
                             </span>
                           )}
                         </td>
@@ -583,41 +589,41 @@ export function RoomHistory({ roomId, members }: RoomHistoryProps) {
         )}
       </div>
 
-      {/* Chronological Timeline */}
+      {}
       <div className="space-y-4">
-        <div className="flex items-center gap-2 border-b border-zinc-850 pb-2.5">
-          <Clock className="w-4.5 h-4.5 text-violet-400" />
-          <h3 className="text-base font-bold text-zinc-200">Full Activity Timeline</h3>
+        <div className="flex items-center gap-2 border-b border-[#e7e7e7] pb-2.5">
+          <Clock className="w-4.5 h-4.5 text-[#262626]" />
+          <h3 className="text-heading-sm font-semibold text-[#141414]">Full Activity Timeline</h3>
         </div>
 
         {groupedActivities.length === 0 ? (
-          <div className="rounded-xl border border-zinc-850 bg-zinc-900/20 p-8 text-center text-zinc-550 text-sm">
+          <div className="border border-[#e7e7e7] bg-white p-8 rounded-[10px] text-center text-[#737373]">
             No timeline logs found for this room.
           </div>
         ) : (
           <div className="space-y-8 pl-1">
             {groupedActivities.map(([dateGroup, items]) => (
               <div key={dateGroup} className="space-y-4">
-                <h4 className="text-xs font-bold text-zinc-500 uppercase tracking-wider pl-4">
+                <h4 className="text-[12px] text-[#737373] tracking-wide pl-4 font-semibold uppercase">
                   {dateGroup}
                 </h4>
 
-                <div className="relative border-l border-zinc-800 ml-6 pl-6 space-y-5">
+                <div className="relative border-l border-[#e7e7e7] ml-6 pl-6 space-y-5">
                   {items.map((act) => {
                     const eventConfig = renderTimelineEvent(act)
 
                     return (
                       <div key={act.id} className="relative">
-                        {/* Bullet point icon */}
+                        {}
                         <div
-                          className={`absolute -left-[36px] top-0 w-6 h-6 rounded-full border flex items-center justify-center shadow-inner ${eventConfig.color}`}
+                          className={`absolute -left-[37px] top-0.5 w-6 h-6 rounded-full border flex items-center justify-center bg-white ${eventConfig.color}`}
                         >
                           {eventConfig.icon}
                         </div>
 
-                        <div className="text-xs leading-normal">
-                          <div className="text-zinc-350">{eventConfig.text}</div>
-                          <span className="text-[9px] font-mono text-zinc-550 block mt-0.5" suppressHydrationWarning>
+                        <div className="text-[13px] leading-relaxed text-[#4e4d4c]">
+                          <div>{eventConfig.text}</div>
+                          <span className="text-[10px] text-[#737373] block mt-0.5" suppressHydrationWarning>
                             {getRelativeTime(act.created_at)} ({new Date(act.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})
                           </span>
                         </div>
@@ -630,21 +636,20 @@ export function RoomHistory({ roomId, members }: RoomHistoryProps) {
 
             {hasMore && (
               <div className="flex justify-center pt-2">
-                <Button
+                <button
                   onClick={loadMoreActivities}
                   disabled={loadingMore}
-                  variant="outline"
-                  className="border-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-900 text-xs py-2 px-6 rounded-xl"
+                  className="border border-[#e7e7e7] bg-white hover:bg-[#f4eee5] text-[#262626] rounded-[5px] font-sans text-xs uppercase px-6 py-2.5 transition-all cursor-pointer flex items-center justify-center shadow-none font-medium"
                 >
                   {loadingMore ? (
                     <>
-                      <Loader2 className="w-3.5 h-3.5 mr-2 animate-spin" />
+                      <Loader2 className="w-3.5 h-3.5 mr-2 animate-spin text-[#262626]" />
                       Loading more timeline…
                     </>
                   ) : (
                     'Load More Activity'
                   )}
-                </Button>
+                </button>
               </div>
             )}
           </div>
@@ -653,3 +658,4 @@ export function RoomHistory({ roomId, members }: RoomHistoryProps) {
     </div>
   )
 }
+

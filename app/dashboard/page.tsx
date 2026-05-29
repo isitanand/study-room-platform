@@ -26,15 +26,15 @@ export default async function DashboardPage() {
     .single()
 
   return (
-    <div className="min-h-screen bg-[#09090b] relative">
-      {/* Subtle background glow */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
-        <div className="absolute top-0 right-1/4 w-[500px] h-[400px] bg-violet-600/4 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 left-1/4 w-[400px] h-[300px] bg-indigo-600/4 rounded-full blur-3xl" />
-      </div>
+    <div className="min-h-screen bg-[#f9f6f2] text-[#262626] relative overflow-hidden">
+      {/* Soft Blurred Background Shapes */}
+      <div className="absolute top-[10%] left-[-10%] w-[400px] h-[400px] bg-[#0A7C6E]/4 rounded-full filter blur-[100px] pointer-events-none z-0" />
+      <div className="absolute bottom-[20%] right-[-5%] w-[500px] h-[500px] bg-[#000015]/4 rounded-full filter blur-[120px] pointer-events-none z-0" />
 
-      <DashboardNavbar profile={profile} email={user.email} />
-      <DashboardClient userId={user.id} />
+      <div className="relative z-10 flex flex-col min-h-screen">
+        <DashboardNavbar profile={profile} email={user.email} />
+        <DashboardClient userId={user.id} />
+      </div>
     </div>
   )
 }

@@ -6,7 +6,6 @@ import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
 import type { Room } from './DashboardClient'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuSeparator, DropdownMenuTrigger,
@@ -91,36 +90,33 @@ export function RoomCard({ room, userId, onRefresh }: RoomCardProps) {
 
   return (
     <>
-      <div className="group relative flex flex-col rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5 hover:border-zinc-700 hover:bg-zinc-900/90 transition-all duration-200 overflow-hidden">
-        {/* Subtle top gradient accent */}
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-violet-500/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-
+      <div className="group relative flex flex-col rounded-[10px] border border-[#e7e7e7] bg-white p-5 hover:border-[#0A7C6E] transition-all duration-300 overflow-hidden shadow-none">
         {/* Card header */}
-        <div className="flex items-start justify-between gap-2 mb-3">
+        <div className="flex items-start justify-between gap-2 mb-3.5">
           <div className="flex-1 min-w-0">
             {/* Badges row */}
-            <div className="flex items-center gap-1.5 flex-wrap mb-1.5">
+            <div className="flex items-center gap-1.5 flex-wrap mb-2">
               {room.has_active_session && (
-                <div className="flex items-center gap-1 rounded-full bg-green-500/10 border border-green-500/20 px-2 py-0.5">
+                <div className="flex items-center gap-1 rounded-full bg-[#e6f4f2] border border-[#0A7C6E]/20 px-2.5 py-0.5">
                   <span className="relative flex h-1.5 w-1.5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
-                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-green-500" />
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#0A7C6E] opacity-75" />
+                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#0A7C6E]" />
                   </span>
-                  <span className="text-[10px] font-semibold text-green-400 leading-none">LIVE</span>
+                  <span className="text-[9px] font-semibold text-[#0A7C6E] uppercase tracking-wider leading-none">LIVE TIMER</span>
                 </div>
               )}
               {isOwner && (
-                <Badge className="text-[10px] px-1.5 h-4 bg-violet-600/15 text-violet-400 border-violet-500/25 hover:bg-violet-600/15">
-                  Owner
-                </Badge>
+                <div className="badge-tag-evernote">
+                  OWNER
+                </div>
               )}
             </div>
 
-            <h3 className="font-semibold text-white leading-tight line-clamp-1 text-[15px]">
+            <h3 className="text-[#141414] font-heading text-2xl font-semibold leading-tight line-clamp-1 truncate">
               {room.name}
             </h3>
             {room.subject && (
-              <p className="text-xs text-violet-400 mt-0.5 font-medium">{room.subject}</p>
+              <p className="text-caption text-[#4e4d4c] font-semibold uppercase mt-1">{room.subject}</p>
             )}
           </div>
 
@@ -130,7 +126,7 @@ export function RoomCard({ room, userId, onRefresh }: RoomCardProps) {
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-7 w-7 shrink-0 text-zinc-600 hover:text-white hover:bg-zinc-800 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity"
+                className="h-7 w-7 shrink-0 text-[#4e4d4c] hover:text-[#141414] hover:bg-[#f9f6f2] opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity rounded-[5px]"
               >
                 <MoreVertical className="h-4 w-4" />
                 <span className="sr-only">Room options</span>
@@ -138,31 +134,31 @@ export function RoomCard({ room, userId, onRefresh }: RoomCardProps) {
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align="end"
-              className="bg-zinc-900 border-zinc-800 text-zinc-300 w-44 shadow-xl shadow-black/40"
+              className="bg-white border border-[#e7e7e7] text-[#262626] w-44 shadow-subtle rounded-[5px] p-1 z-50"
             >
               <DropdownMenuItem asChild>
                 <Link
                   href={`/rooms/${room.id}`}
-                  className="flex items-center gap-2 hover:bg-zinc-800 hover:text-white cursor-pointer px-2 py-1.5 rounded-sm"
+                  className="flex items-center gap-2 hover:bg-[#e6f4f2] hover:text-[#0A7C6E] cursor-pointer px-2.5 py-2 rounded-[5px] text-caption uppercase font-medium"
                 >
-                  <ArrowRight className="w-3.5 h-3.5" />
+                  <ArrowRight className="w-3.5 h-3.5 text-[#0A7C6E]" />
                   Enter Room
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={copyInviteCode}
-                className="hover:bg-zinc-800 hover:text-white cursor-pointer gap-2"
+                className="hover:bg-[#f4eee5] hover:text-black cursor-pointer gap-2 px-2.5 py-2 rounded-[5px] text-caption uppercase font-medium"
               >
-                <Copy className="w-3.5 h-3.5" />
+                <Copy className="w-3.5 h-3.5 text-[#4e4d4c]" />
                 Copy Invite Code
               </DropdownMenuItem>
 
-              <DropdownMenuSeparator className="bg-zinc-800" />
+              <DropdownMenuSeparator className="bg-[#e7e7e7] my-1" />
 
               {!isOwner && (
                 <DropdownMenuItem
                   onClick={() => setLeaveOpen(true)}
-                  className="text-red-400 hover:bg-red-950/30 hover:text-red-300 cursor-pointer gap-2 focus:text-red-300 focus:bg-red-950/30"
+                  className="text-destructive hover:bg-red-50 cursor-pointer gap-2 px-2.5 py-2 rounded-[5px] text-caption uppercase font-medium"
                 >
                   <LogOut className="w-3.5 h-3.5" />
                   Leave Room
@@ -171,7 +167,7 @@ export function RoomCard({ room, userId, onRefresh }: RoomCardProps) {
               {isOwner && (
                 <DropdownMenuItem
                   onClick={() => setDeleteOpen(true)}
-                  className="text-red-400 hover:bg-red-950/30 hover:text-red-300 cursor-pointer gap-2 focus:text-red-300 focus:bg-red-950/30"
+                  className="text-destructive hover:bg-red-50 cursor-pointer gap-2 px-2.5 py-2 rounded-[5px] text-caption uppercase font-medium"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                   Delete Room
@@ -184,25 +180,25 @@ export function RoomCard({ room, userId, onRefresh }: RoomCardProps) {
         {/* Description */}
         <div className="flex-1 mb-4">
           {room.description ? (
-            <p className="text-sm text-zinc-500 leading-relaxed line-clamp-2">
+            <p className="text-body text-[#262626] leading-relaxed line-clamp-2">
               {room.description}
             </p>
           ) : (
-            <p className="text-sm text-zinc-700 italic">No description</p>
+            <p className="text-caption text-[#4e4d4c] uppercase italic">No description</p>
           )}
         </div>
 
         {/* Room Metrics & Aggregations */}
-        <div className="grid grid-cols-2 gap-2 mb-4 bg-zinc-950/40 rounded-xl p-3 border border-zinc-800/40 text-[11px] text-zinc-400">
+        <div className="grid grid-cols-2 gap-2 mb-4 bg-[#f9f6f2] rounded-[5px] p-3.5 border border-[#e7e7e7] text-caption text-[#4e4d4c] uppercase font-medium">
           <div>
-            <span className="text-zinc-650 block text-[9px] uppercase font-bold tracking-wider mb-0.5">Sessions</span>
-            <span className="font-semibold text-zinc-300 font-mono">
+            <span className="text-[#4e4d4c] block text-[9px] tracking-wider mb-0.5">Sessions</span>
+            <span className="text-[#141414] font-semibold">
               {room.total_completed_sessions || 0} completed
             </span>
           </div>
           <div>
-            <span className="text-zinc-650 block text-[9px] uppercase font-bold tracking-wider mb-0.5">Study Time</span>
-            <span className="font-semibold text-zinc-300 font-mono">
+            <span className="text-[#4e4d4c] block text-[9px] tracking-wider mb-0.5">Study Time</span>
+            <span className="text-[#141414] font-semibold">
               {(() => {
                 const totalSecs = room.total_study_time_seconds || 0
                 const hrs = Math.floor(totalSecs / 3600)
@@ -213,9 +209,9 @@ export function RoomCard({ room, userId, onRefresh }: RoomCardProps) {
             </span>
           </div>
           {room.last_active_at && (
-            <div className="col-span-2 border-t border-zinc-800/45 pt-1.5 mt-1">
-              <span className="text-zinc-650 block text-[9px] uppercase font-bold tracking-wider mb-0.5">Last Active</span>
-              <span className="font-medium text-zinc-400" suppressHydrationWarning>
+            <div className="col-span-2 border-t border-[#e7e7e7] pt-2 mt-1.5">
+              <span className="text-[#4e4d4c] block text-[9px] tracking-wider mb-0.5">Last Active</span>
+              <span className="text-[#141414] font-semibold" suppressHydrationWarning>
                 {(() => {
                   try {
                     const then = new Date(room.last_active_at).getTime()
@@ -240,21 +236,17 @@ export function RoomCard({ room, userId, onRefresh }: RoomCardProps) {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between pt-3.5 border-t border-zinc-800/80">
-          <div className="flex items-center gap-1.5 text-xs text-zinc-500">
-            <Users className="w-3.5 h-3.5" />
+        <div className="flex items-center justify-between pt-3.5 border-t border-[#e7e7e7]">
+          <div className="flex items-center gap-1.5 text-caption text-[#4e4d4c] uppercase font-semibold">
+            <Users className="w-3.5 h-3.5 text-[#4e4d4c]" />
             <span>
               {room.member_count} member{room.member_count !== 1 ? 's' : ''}
             </span>
           </div>
           <Link href={`/rooms/${room.id}`}>
-            <Button
-              size="sm"
-              className="h-8 px-3 text-xs bg-violet-600/15 hover:bg-violet-600/25 text-violet-300 border border-violet-500/20 hover:border-violet-400/40 transition-all shadow-none"
-            >
-              Enter
-              <ArrowRight className="w-3 h-3 ml-1.5" />
-            </Button>
+            <button className="btn-evernote-primary text-xs py-1.5 px-4 h-8 uppercase">
+              ENTER
+            </button>
           </Link>
         </div>
 
@@ -262,10 +254,10 @@ export function RoomCard({ room, userId, onRefresh }: RoomCardProps) {
         <button
           onClick={copyInviteCode}
           title="Click to copy invite code"
-          className="mt-2 flex items-center gap-1.5 group/code w-fit"
+          className="mt-3.5 flex items-center gap-2 group/code w-fit"
         >
-          <Copy className="w-3 h-3 text-zinc-700 group-hover/code:text-zinc-500 transition-colors" />
-          <code className="text-[11px] font-mono text-zinc-700 group-hover/code:text-zinc-500 transition-colors tracking-wider">
+          <Copy className="w-3.5 h-3.5 text-[#a1a1a1] group-hover/code:text-[#0A7C6E] transition-colors" />
+          <code className="text-caption text-[#4e4d4c] group-hover/code:text-[#141414] transition-colors tracking-wider uppercase font-semibold">
             {room.invite_code}
           </code>
         </button>
@@ -273,21 +265,21 @@ export function RoomCard({ room, userId, onRefresh }: RoomCardProps) {
 
       {/* Leave confirmation */}
       <AlertDialog open={leaveOpen} onOpenChange={setLeaveOpen}>
-        <AlertDialogContent className="bg-zinc-900 border-zinc-800 text-white">
+        <AlertDialogContent className="bg-white border border-[#e7e7e7] text-black max-w-sm rounded-[16px] shadow-none p-6">
           <AlertDialogHeader>
-            <AlertDialogTitle>Leave &ldquo;{room.name}&rdquo;?</AlertDialogTitle>
-            <AlertDialogDescription className="text-zinc-400">
-              You&apos;ll be removed from this room. To rejoin, you&apos;ll need a new invite code from the room owner.
+            <AlertDialogTitle className="text-heading text-black font-semibold uppercase text-xl">Leave &ldquo;{room.name}&rdquo;?</AlertDialogTitle>
+            <AlertDialogDescription className="text-[#4e4d4c] text-caption uppercase leading-relaxed font-semibold">
+              You&apos;ll be removed from this study room. To rejoin, you&apos;ll need a new invite code from the room owner.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel className="bg-zinc-800 border-zinc-700 text-zinc-300 hover:bg-zinc-700 hover:text-white">
+          <AlertDialogFooter className="mt-4 gap-2.5">
+            <AlertDialogCancel className="bg-[#f9f6f2] border border-[#e7e7e7] text-[#4e4d4c] hover:bg-[#f4eee5] hover:text-[#141414] rounded-[5px] text-caption uppercase py-2">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleLeave}
               disabled={actionLoading}
-              className="bg-red-600 hover:bg-red-500 text-white border-0"
+              className="bg-destructive hover:opacity-95 text-white border-0 rounded-[5px] text-caption uppercase py-2"
             >
               {actionLoading ? 'Leaving…' : 'Leave Room'}
             </AlertDialogAction>
@@ -297,21 +289,21 @@ export function RoomCard({ room, userId, onRefresh }: RoomCardProps) {
 
       {/* Delete confirmation */}
       <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
-        <AlertDialogContent className="bg-zinc-900 border-zinc-800 text-white">
+        <AlertDialogContent className="bg-white border border-[#e7e7e7] text-black max-w-sm rounded-[16px] shadow-none p-6">
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete &ldquo;{room.name}&rdquo;?</AlertDialogTitle>
-            <AlertDialogDescription className="text-zinc-400">
+            <AlertDialogTitle className="text-heading text-black font-semibold uppercase text-xl">Delete &ldquo;{room.name}&rdquo;?</AlertDialogTitle>
+            <AlertDialogDescription className="text-[#4e4d4c] text-caption uppercase leading-relaxed font-semibold">
               This will permanently deactivate the room and remove access for all members. This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel className="bg-zinc-800 border-zinc-700 text-zinc-300 hover:bg-zinc-700 hover:text-white">
+          <AlertDialogFooter className="mt-4 gap-2.5">
+            <AlertDialogCancel className="bg-[#f9f6f2] border border-[#e7e7e7] text-[#4e4d4c] hover:bg-[#f4eee5] hover:text-[#141414] rounded-[5px] text-caption uppercase py-2">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               disabled={actionLoading}
-              className="bg-red-600 hover:bg-red-500 text-white border-0"
+              className="bg-destructive hover:opacity-95 text-white border-0 rounded-[5px] text-caption uppercase py-2"
             >
               {actionLoading ? 'Deleting…' : 'Delete Room'}
             </AlertDialogAction>

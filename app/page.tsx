@@ -1,8 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
-import { BookOpen, Users, Timer, MessageSquare, ArrowRight, Sparkles } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { Users, Timer, MessageSquare, Clock, ArrowRight } from 'lucide-react'
 
 export default async function HomePage() {
   const supabase = await createClient()
@@ -16,128 +15,164 @@ export default async function HomePage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#09090b] flex flex-col relative overflow-hidden">
-      {/* Background effects */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[600px] bg-violet-600/8 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-1/4 w-[500px] h-[400px] bg-indigo-600/6 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 right-0 w-[400px] h-[500px] bg-purple-700/5 rounded-full blur-3xl" />
-        {/* Grid overlay */}
-        <div
-          className="absolute inset-0 opacity-[0.03]"
-          style={{
-            backgroundImage:
-              'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
-            backgroundSize: '60px 60px',
-          }}
-        />
+    <main className="min-h-screen bg-[#f9f6f2] flex flex-col relative overflow-hidden text-[#262626] font-sans">
+      
+      {/* 1. Announcement Bar */}
+      <div className="w-full bg-[#f4eee5] text-[#262626] text-center py-2.5 px-4 z-50 relative border-b border-[#e7e7e7]">
+        <span className="text-caption uppercase tracking-wider font-semibold">
+          NEW: Synced Real-Time Pomodoro Modules Live Now — Start Free
+        </span>
       </div>
 
-      {/* Header */}
-      <header className="relative z-10 flex items-center justify-between px-6 py-5 max-w-6xl mx-auto w-full">
-        <div className="flex items-center gap-2.5">
-          <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-violet-600/20 border border-violet-500/30">
-            <BookOpen className="w-4.5 h-4.5 text-violet-400" />
+      {/* 2. Floating Abstract Shapes (Decorative organic shapes in hero bg) */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+        <div className="absolute top-[10%] left-[-10%] w-[500px] h-[500px] bg-[#0A7C6E]/5 rounded-full filter blur-[120px]" />
+        <div className="absolute top-[30%] right-[-10%] w-[600px] h-[600px] bg-[#000015]/5 rounded-full filter blur-[150px]" />
+      </div>
+
+      {/* 3. Header */}
+      <header className="sticky top-0 z-40 w-full bg-[#f9f6f2]/90 backdrop-blur-md border-b border-[#e7e7e7]">
+        <div className="flex items-center justify-between px-6 py-4 max-w-[1320px] mx-auto w-full">
+          <div className="flex items-center gap-2">
+            {/* Outline Logo Container */}
+            <div className="w-8 h-8 rounded-[5px] border border-[#e7e7e7] bg-white flex items-center justify-center text-black">
+              <svg
+                className="w-4 h-4 text-[#0A7C6E] stroke-[2]"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+              </svg>
+            </div>
+            <span className="font-heading text-xl font-semibold tracking-tight text-[#141414]">
+              StudyRoom
+            </span>
           </div>
-          <span className="font-bold text-white text-lg tracking-tight">StudyRoom</span>
-        </div>
-        <nav className="flex items-center gap-3">
-          <Link href="/auth/login">
-            <Button
-              variant="ghost"
-              className="text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
-            >
+          <nav className="flex items-center gap-4">
+            <Link href="/auth/login" className="btn-evernote-ghost hover:opacity-60 transition-opacity">
               Sign in
-            </Button>
-          </Link>
-          <Link href="/auth/signup">
-            <Button className="bg-violet-600 hover:bg-violet-500 text-white shadow-lg shadow-violet-900/30 transition-all">
-              Get started
-            </Button>
-          </Link>
-        </nav>
+            </Link>
+            <Link href="/auth/signup" className="btn-evernote-primary text-xs uppercase px-5 py-2">
+              Get Started
+            </Link>
+          </nav>
+        </div>
       </header>
 
-      {/* Hero */}
-      <section className="relative z-10 flex flex-col items-center text-center px-6 pt-20 pb-24 max-w-4xl mx-auto w-full">
-        <div className="inline-flex items-center gap-2 rounded-full bg-violet-600/10 border border-violet-500/20 px-4 py-1.5 text-sm text-violet-400 mb-8">
-          <Sparkles className="w-3.5 h-3.5" />
-          Collaborative studying, reimagined
-        </div>
+      {/* 4. Hero Section */}
+      <section className="relative z-10 flex flex-col items-center text-center px-6 pt-24 pb-20 max-w-[1320px] mx-auto w-full flex-1 justify-center">
+        
+        <span className="text-caption uppercase tracking-wider text-[#4e4d4c] mb-6 font-semibold bg-[#f4eee5] px-3 py-1 rounded-[5px]">
+          COLLABORATIVE STUDY SPACE — V2.0
+        </span>
 
-        <h1 className="text-5xl md:text-7xl font-bold text-white tracking-tight leading-[1.05] mb-6">
-          Study smarter,{' '}
-          <span className="bg-gradient-to-r from-violet-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent">
-            together
-          </span>
+        <h1 className="text-display text-[#141414] font-semibold mb-8 leading-[1.1] select-none max-w-4xl text-center">
+          Your study space, organized.
         </h1>
 
-        <p className="text-xl text-zinc-400 leading-relaxed max-w-2xl mb-10">
-          Create virtual study rooms, invite your peers, run timed Pomodoro sessions, and
-          collaborate in real-time — all in one focused space.
+        <p className="text-subheading text-[#262626] max-w-2xl mb-12 text-center leading-relaxed">
+          Remember everything and track your focused Pomodoro sessions. Timed study modules synced in real-time, persistent team chat, and active peer presence indicators. Built as a calm focus environment.
         </p>
 
-        <div className="flex flex-col sm:flex-row gap-4">
-          <Link href="/auth/signup">
-            <Button
-              id="hero-cta"
-              size="lg"
-              className="bg-violet-600 hover:bg-violet-500 text-white h-13 px-8 text-base font-medium shadow-xl shadow-violet-900/30 transition-all duration-200 hover:scale-[1.02]"
-            >
-              Start studying free
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
-          </Link>
-          <Link href="/auth/login">
-            <Button
-              size="lg"
-              variant="outline"
-              className="border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-white h-13 px-8 text-base transition-all"
-            >
-              Sign in
-            </Button>
-          </Link>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center w-full max-w-md">
+          <div className="relative flex items-center w-full border border-[#e7e7e7] bg-white rounded-[5px] p-1.5 focus-within:border-[#0A7C6E] transition-colors shadow-none">
+            <input 
+              type="email" 
+              placeholder="ENTER YOUR STUDENT EMAIL" 
+              className="w-full bg-white text-black font-sans text-sm placeholder:text-[#4e4d4c]/50 px-4 py-3 outline-none rounded-[5px]"
+            />
+            <Link href="/auth/signup" className="absolute right-2">
+              <button className="btn-evernote-primary text-xs uppercase px-5 py-2.5">
+                START FREE
+              </button>
+            </Link>
+          </div>
         </div>
       </section>
 
-      {/* Features */}
-      <section className="relative z-10 px-6 pb-24 max-w-5xl mx-auto w-full">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[
-            {
-              icon: Users,
-              title: 'Study Rooms',
-              desc: 'Create or join rooms with an invite code and study with your group.',
-            },
-            {
-              icon: Timer,
-              title: 'Timed Sessions',
-              desc: 'Start focused Pomodoro-style sessions tracked for the whole room.',
-            },
-            {
-              icon: MessageSquare,
-              title: 'Real-time Chat',
-              desc: 'Communicate with roommates via instant messaging powered by Supabase Realtime.',
-            },
-            {
-              icon: BookOpen,
-              title: 'Activity Log',
-              desc: 'Review session history and track collective study progress over time.',
-            },
-          ].map(({ icon: Icon, title, desc }) => (
-            <div
-              key={title}
-              className="rounded-2xl border border-zinc-800 bg-zinc-900/60 backdrop-blur-sm p-6 hover:border-zinc-700 hover:bg-zinc-900/80 transition-all duration-200 group"
-            >
-              <div className="w-10 h-10 rounded-xl bg-violet-600/15 border border-violet-500/20 flex items-center justify-center mb-4 group-hover:bg-violet-600/20 transition-colors">
-                <Icon className="w-5 h-5 text-violet-400" />
-              </div>
-              <h3 className="text-white font-semibold mb-2">{title}</h3>
-              <p className="text-zinc-500 text-sm leading-relaxed">{desc}</p>
+      {/* 5. Features Section (Primary Feature Cards) */}
+      <section className="relative z-10 w-full bg-[#f4eee5] border-t border-[#e7e7e7] py-28">
+        <div className="max-w-[1320px] mx-auto px-6">
+          
+          <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-[#e7e7e7] pb-6">
+            <div>
+              <span className="text-caption uppercase text-[#4e4d4c] font-semibold">
+                SYSTEM USE-CASES & FEATURES
+              </span>
+              <h2 className="text-heading text-[#141414] font-semibold mt-2">
+                04 Functional Modules
+              </h2>
             </div>
-          ))}
+            <p className="text-body text-[#4e4d4c] max-w-sm uppercase font-semibold font-mono tracking-wider text-xs md:text-right">
+              Everything in one calm interface
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {[
+              {
+                title: 'STUDY ROOMS',
+                desc: 'Create or join highly-collaborative study spaces using secure 8-character invite codes.',
+                icon: <Users className="w-5 h-5 text-[#0A7C6E]" />,
+              },
+              {
+                title: 'TIMED SESSIONS',
+                desc: 'Run precision timed Pomodoro rounds synced across all active room participants in real-time.',
+                icon: <Timer className="w-5 h-5 text-[#0A7C6E]" />,
+              },
+              {
+                title: 'REALTIME CHAT',
+                desc: 'Instant message streams backed by flat presence status mapping and persistent histories.',
+                icon: <MessageSquare className="w-5 h-5 text-[#0A7C6E]" />,
+              },
+              {
+                title: 'ACTIVITY LOGS',
+                desc: 'Review detailed team progress updates, study duration statistics, and room histories.',
+                icon: <Clock className="w-5 h-5 text-[#0A7C6E]" />,
+              },
+            ].map((row) => (
+              <div 
+                key={row.title}
+                className="card-evernote-primary flex gap-6 items-start hover:border-[#0A7C6E] transition-colors"
+              >
+                {/* Outlined Icon Wrapper */}
+                <div className="w-10 h-10 rounded-[5px] border border-[#e7e7e7] bg-[#f9f6f2] flex items-center justify-center shrink-0">
+                  {row.icon}
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-heading-sm text-[#141414] font-semibold">
+                    {row.title}
+                  </h3>
+                  <p className="text-body text-[#262626]">
+                    {row.desc}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+
         </div>
       </section>
+
+      {/* 6. Footer */}
+      <footer className="w-full bg-[#f9f6f2] border-t border-[#e7e7e7] py-8 px-6 relative z-10">
+        <div className="max-w-[1320px] mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+          <span className="text-caption text-[#4e4d4c] font-semibold">
+            © {new Date().getFullYear()} StudyRoom Inc. Powered by Evernote design system.
+          </span>
+          <div className="flex items-center gap-6">
+            <Link href="#" className="text-caption text-[#4e4d4c] hover:text-[#141414] font-semibold">
+              TERMS
+            </Link>
+            <Link href="#" className="text-caption text-[#4e4d4c] hover:text-[#141414] font-semibold">
+              PRIVACY
+            </Link>
+          </div>
+        </div>
+      </footer>
     </main>
   )
 }
