@@ -199,7 +199,13 @@ export function RoomClient({
           })
         }
       )
-      .subscribe()
+      .subscribe((status, err) => {
+        if (err) {
+          import('sonner').then(({ toast }) => toast.error(`Messages Realtime error: ${err.message}`))
+        } else if (status === 'CHANNEL_ERROR') {
+          import('sonner').then(({ toast }) => toast.error('Messages Realtime subscription failed (Channel Error)'))
+        }
+      })
 
     
     const sessionChannel = supabase
