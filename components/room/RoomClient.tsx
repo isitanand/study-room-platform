@@ -164,10 +164,10 @@ export function RoomClient({
           event: 'INSERT',
           schema: 'public',
           table: 'messages',
-          filter: `room_id=eq.${room.id}`,
         },
         async (payload) => {
           const newMsg = payload.new as any
+          if (newMsg.room_id !== room.id) return
           const profile = await getOrFetchProfile(newMsg.user_id)
           
           setMessages((prev) => {
@@ -192,11 +192,11 @@ export function RoomClient({
           event: '*', 
           schema: 'public',
           table: 'study_sessions',
-          filter: `room_id=eq.${room.id}`,
         },
         (payload) => {
           const session = payload.new as any
-          if (!session || !session.is_active) {
+          if (!session || session.room_id !== room.id) return
+          if (!session.is_active) {
             setActiveSession(null)
           } else {
             setActiveSession({
@@ -218,10 +218,10 @@ export function RoomClient({
           event: 'INSERT',
           schema: 'public',
           table: 'activity_log',
-          filter: `room_id=eq.${room.id}`,
         },
         async (payload) => {
           const newAct = payload.new as any
+          if (newAct.room_id !== room.id) return
           const profile = await getOrFetchProfile(newAct.user_id)
 
           setActivities((prev) => {
