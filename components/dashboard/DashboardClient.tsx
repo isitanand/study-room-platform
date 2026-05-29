@@ -419,6 +419,27 @@ export function DashboardClient({ userId }: DashboardClientProps) {
                   onRefresh={fetchAllDashboardData}
                 />
               ))}
+              {rooms.length === 1 && (
+                <div className="rounded-[10px] border border-dashed border-[#e7e7e7] bg-white/50 p-5 flex flex-col justify-between hover:border-[#0A7C6E]/40 transition-colors">
+                  <div>
+                    <div className="flex items-center gap-2 text-[#0A7C6E] mb-3">
+                      <span className="p-1.5 rounded-[5px] bg-[#e6f4f2] border border-[#0A7C6E]/20">
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364.364l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                        </svg>
+                      </span>
+                      <span className="text-[11px] font-semibold tracking-wider uppercase">Quick Tip</span>
+                    </div>
+                    <h4 className="font-sans font-semibold text-[#141414] text-[14px]">Grow Your Study Group</h4>
+                    <p className="text-[12px] text-[#4e4d4c] mt-2 leading-relaxed">
+                      Share the unique 8-character invite code on your room card with classmates or colleagues to study together in real-time.
+                    </p>
+                  </div>
+                  <div className="text-[11px] text-[#737373] mt-4 pt-3 border-t border-[#e7e7e7]/60">
+                    Ready to expand? Create more rooms for different subjects.
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
