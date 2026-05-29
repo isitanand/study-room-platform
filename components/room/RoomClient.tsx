@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
@@ -122,10 +122,15 @@ export function RoomClient({
     }
   }, [isDragging])
 
+  const membersRef = useRef<Member[]>(members)
+  useEffect(() => {
+    membersRef.current = members
+  }, [members])
+
   
   const getOrFetchProfile = useCallback(
     async (userId: string): Promise<Profile | undefined> => {
-      const existing = members.find((m) => m.userId === userId)
+      const existing = membersRef.current.find((m) => m.userId === userId)
       if (existing?.profile) return existing.profile
 
       const { data } = await supabase
@@ -137,7 +142,7 @@ export function RoomClient({
       if (data) return data
       return undefined
     },
-    [members, supabase]
+    [supabase]
   )
 
   
