@@ -302,13 +302,41 @@ export function RoomClient({
 
   
   const handleSendMessage = async (content: string) => {
-    const { error } = await supabase.from('messages').insert({
-      room_id: room.id,
-      user_id: currentUser.id,
-      content: content.trim(),
-    })
+    const { data, error } = await supabase
+      .from('messages')
+      .insert({
+        room_id: room.id,
+        user_id: currentUser.id,
+        content: content.trim(),
+      })
+      .select()
+      .single()
 
     if (error) throw error
+
+    if (data) {
+      const myMember = members.find((m) => m.userId === currentUser.id)
+      const profile = myMember?.profile || {
+        username: currentUser.email?.split('@')[0] || 'User',
+        full_name: myMember?.profile?.full_name,
+        avatar_url: myMember?.profile?.avatar_url,
+      }
+
+      setMessages((prev) => {
+        if (prev.some((m) => m.id === data.id)) return prev
+        return [
+          ...prev,
+          {
+            id: data.id,
+            roomId: data.room_id,
+            userId: data.user_id,
+            content: data.content,
+            createdAt: data.created_at,
+            profile,
+          },
+        ]
+      })
+    }
   }
 
   
