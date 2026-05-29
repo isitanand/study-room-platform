@@ -148,28 +148,16 @@ export function RoomClient({
   
   useEffect(() => {
     
-    const presenceChannel = supabase.channel(`room_presence:${room.id}`, {
+    const roomChannel = supabase.channel(`room:${room.id}`, {
       config: { presence: { key: currentUser.id } },
     })
 
-    presenceChannel
+    roomChannel
       .on('presence', { event: 'sync' }, () => {
-        const state = presenceChannel.presenceState()
+        const state = roomChannel.presenceState()
         const onlineIds = Object.keys(state)
         setOnlineUserIds(onlineIds)
       })
-      .subscribe(async (status) => {
-        if (status === 'SUBSCRIBED') {
-          await presenceChannel.track({
-            user_id: currentUser.id,
-            online_at: new Date().toISOString(),
-          })
-        }
-      })
-
-    
-    const messageChannel = supabase
-      .channel(`room_messages:${room.id}`)
       .on(
         'postgres_changes',
         {
@@ -183,7 +171,6 @@ export function RoomClient({
           const profile = await getOrFetchProfile(newMsg.user_id)
           
           setMessages((prev) => {
-            
             if (prev.some((m) => m.id === newMsg.id)) return prev
             return [
               ...prev,
@@ -199,17 +186,6 @@ export function RoomClient({
           })
         }
       )
-      .subscribe((status, err) => {
-        if (err) {
-          import('sonner').then(({ toast }) => toast.error(`Messages Realtime error: ${err.message}`))
-        } else if (status === 'CHANNEL_ERROR') {
-          import('sonner').then(({ toast }) => toast.error('Messages Realtime subscription failed (Channel Error)'))
-        }
-      })
-
-    
-    const sessionChannel = supabase
-      .channel(`room_sessions:${room.id}`)
       .on(
         'postgres_changes',
         {
@@ -236,11 +212,6 @@ export function RoomClient({
           }
         }
       )
-      .subscribe()
-
-    
-    const activityChannel = supabase
-      .channel(`room_activities:${room.id}`)
       .on(
         'postgres_changes',
         {
@@ -269,9 +240,7 @@ export function RoomClient({
             ].slice(0, 20) 
           })
 
-          
           if (newAct.action === 'join' || newAct.action === 'member_joined') {
-            
             const { data: membersRaw } = await supabase
               .from('room_members')
               .select(`
@@ -301,13 +270,21 @@ export function RoomClient({
           }
         }
       )
-      .subscribe()
+      .subscribe(async (status, err) => {
+        if (err) {
+          import('sonner').then(({ toast }) => toast.error(`Realtime error: ${err.message}`))
+        } else if (status === 'CHANNEL_ERROR') {
+          import('sonner').then(({ toast }) => toast.error('Realtime subscription failed (Channel Error)'))
+        } else if (status === 'SUBSCRIBED') {
+          await roomChannel.track({
+            user_id: currentUser.id,
+            online_at: new Date().toISOString(),
+          })
+        }
+      })
 
     return () => {
-      supabase.removeChannel(presenceChannel)
-      supabase.removeChannel(messageChannel)
-      supabase.removeChannel(sessionChannel)
-      supabase.removeChannel(activityChannel)
+      supabase.removeChannel(roomChannel)
     }
   }, [room.id, currentUser.id, getOrFetchProfile, supabase])
 
