@@ -83,6 +83,11 @@ export function StudyChart({ data }: StudyChartProps) {
                 height={36}
                 iconSize={8}
                 iconType="circle"
+                formatter={(value) => (
+                  <span className="font-sans text-[11px] font-medium text-[#4e4d4c] uppercase tracking-wider">
+                    {value}
+                  </span>
+                )}
                 wrapperStyle={{
                   fontSize: 11,
                   fontFamily: 'Figtree',
