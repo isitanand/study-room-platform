@@ -73,7 +73,7 @@ export function RoomClient({
   initialActivities,
 }: RoomClientProps) {
   const router = useRouter()
-  const supabase = createClient()
+  const [supabase] = useState(() => createClient())
 
   
   const [activeTab, setActiveTab] = useState<'chat' | 'history'>('chat')
