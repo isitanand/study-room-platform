@@ -1,7 +1,7 @@
 # StudyRoom — Collaborative Study Platform
 
 ## 🚀 Live Demo
-[https://study-room-collaborative-platform.vercel.app](https://study-room-collaborative-platform.vercel.app)
+[https://study-room-platform.vercel.app/](https://study-room-platform.vercel.app/)
 
 ## 📋 Project Overview
 StudyRoom is a real-time collaborative study space designed for peer learning groups and students. The platform allows users to create virtual study rooms, manage live synchronized study sessions, message each other in real-time, trace complete study histories, and visualize personal performance analytics inside a unified workspace.
