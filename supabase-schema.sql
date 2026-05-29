@@ -142,6 +142,27 @@ CREATE POLICY "Allow public select access to activity log"
 CREATE POLICY "Allow insertion into activity log" 
     ON public.activity_log FOR INSERT WITH CHECK (auth.uid() = user_id);
 
+-- 8. Automatic Profile Creation Trigger
+-- Automatically creates a user profile in public.profiles when a user signs up via Supabase Auth
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO public.profiles (id, username, full_name, avatar_url)
+  VALUES (
+    new.id,
+    COALESCE(new.raw_user_meta_data->>'username', split_part(new.email, '@', 1)),
+    new.raw_user_meta_data->>'full_name',
+    new.raw_user_meta_data->>'avatar_url'
+  );
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE OR REPLACE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+
 
 
 
